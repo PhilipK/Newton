@@ -9,11 +9,11 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-struct MyState;
+mod player;
+mod newton;
+mod playercamera;
 
-impl SimpleState for MyState {
-    fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {}
-}
+
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -35,7 +35,7 @@ fn main() -> amethyst::Result<()> {
         )?
         .with_bundle(TransformBundle::new())?;
 
-    let mut game = Application::new(assets_dir, MyState, game_data)?;
+    let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
     game.run();
 
     Ok(())
