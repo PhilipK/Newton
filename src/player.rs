@@ -1,3 +1,4 @@
+use crate::components::{Acceleration, Velocity};
 use amethyst::core::timing::Time;
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
@@ -32,6 +33,8 @@ pub fn load_sprite_sheet(world: &World) -> Handle<SpriteSheet> {
 pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut player_transform = Transform::default();
 
+    let velocity = Velocity::new(0.0, 0.0);
+    let acceleration = Acceleration::new(1.0, 1.0);
     //Position the player
     player_transform.set_translation_xyz(10.0, 10.0, 0.0);
 
@@ -44,6 +47,8 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
     world
         .create_entity()
         .with(player_transform)
+        .with(velocity)
+        .with(acceleration)
         .with(sprite_render.clone())
         .build();
 }

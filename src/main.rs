@@ -13,6 +13,9 @@ mod player;
 mod newton;
 mod playercamera;
 
+mod systems;
+mod components;
+
 
 
 fn main() -> amethyst::Result<()> {
@@ -29,11 +32,13 @@ fn main() -> amethyst::Result<()> {
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                        .with_clear([0.0, 0.168627451, 0.2117647059, 1.0]),
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
-        .with_bundle(TransformBundle::new())?;
+        .with_bundle(TransformBundle::new())?
+        .with(systems::VelocityToTransformSystem, "velocity_to_transform_system", &[])
+        .with(systems::AccelerationToVelocitySystem, "acceleration_to_velocity_system", &["velocity_to_transform_system"]);
 
     let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
     game.run();
