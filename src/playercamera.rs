@@ -5,8 +5,8 @@ use amethyst::{
     renderer::{Camera},
 };
 
-pub const CAMERA_HEIGHT: f32 = 100.0;
-pub const CAMERA_WIDTH: f32 = 100.0;
+pub const CAMERA_HEIGHT: f32 = 1000.0;
+pub const CAMERA_WIDTH: f32 = 1000.0;
 
 pub fn initialize_camera(world: &mut World) {
     let mut transform = Transform::default();

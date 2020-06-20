@@ -17,9 +17,9 @@ impl<'s> System<'s> for VelocityToTransformSystem {
     fn run(&mut self, (mut transforms, velocities, time): Self::SystemData) {
         let delta_time = time.delta_seconds();
         for (velocity, transform) in (&velocities, &mut transforms).join() {
-            let v = velocity.velocity;
-            transform.prepend_translation_x(v[0] * delta_time);
-            transform.prepend_translation_y(v[1] * delta_time);
+            let v = velocity.velocity * delta_time;
+            transform.prepend_translation_x(v.x);
+            transform.prepend_translation_y(v.y);
         }
     }
 }

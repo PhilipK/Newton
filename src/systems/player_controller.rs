@@ -29,9 +29,6 @@ impl<'s> System<'s> for PlayerControlllerSystem {
                 Some(value) => value * delta_time * player.forward_thrust_power,
                 None => 0.0,
             };
-            if throttle != 0.0 {
-                println!("throttle {}", throttle);
-            }
 
             let player_up_3d = transform.isometry().inverse().rotation * Vector3::y();
             let player_up_2d = Vector2::new(player_up_3d.x, player_up_3d.y);
