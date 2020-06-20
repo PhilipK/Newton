@@ -1,42 +1,42 @@
-use amethyst::core::{SystemDesc, Transform};
+use amethyst::core::math::Vector2;
+use amethyst::core::math::Vector3;
+use amethyst::core::timing::Time;
+use amethyst::core::Transform;
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
 use amethyst::input::{InputHandler, StringBindings};
+
+use crate::components::Force;
+use crate::components::Player;
 
 #[derive(SystemDesc)]
 pub struct PlayerControlllerSystem;
 
 impl<'s> System<'s> for PlayerControlllerSystem {
     type SystemData = (
-        WriteStorage<'s, Transform>,
-        ReadStorage<'s, Paddle>,
+        WriteStorage<'s, Force>,
+        ReadStorage<'s, Player>,
+        ReadStorage<'s, Transform>,
         Read<'s, InputHandler<StringBindings>>,
+        Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut transforms, paddles, input): Self::SystemData) {
-        for (paddle, transform) in (&paddles, &mut transforms).join() {
-            let movement = match paddle.side {
-                Side::Left => input.axis_value("left_paddle"),
-                Side::Right => input.axis_value("right_paddle"),
+    fn run(&mut self, (mut forces, players, tarnsforms, input, time): Self::SystemData) {
+        for (force, player, transform) in (&mut forces, &players, &tarnsforms).join() {
+            // let rotate = input.axis_value("rotate");
+            let delta_time = time.delta_seconds();
+            let throttle = match input.axis_value("throttle") {
+                Some(value) => value * delta_time * player.forward_thrust_power,
+                None => 0.0,
             };
-            if let Some(mv_amount) = movement {
-                let scaled_amount = 1.2 * mv_amount as f32;
-                let paddle_y = transform.translation().y;
-                transform.set_translation_y(
-                    (paddle_y + scaled_amount)
-                        .min(ARENA_HEIGHT - PADDLE_HEIGHT * 0.5) // upper bound
-                        .max(PADDLE_HEIGHT * 0.5), // lower bound
-                );
+            if throttle != 0.0 {
+                println!("throttle {}", throttle);
             }
+
+            let player_up_3d = transform.isometry().inverse().rotation * Vector3::y();
+            let player_up_2d = Vector2::new(player_up_3d.x, player_up_3d.y);
+            let add_force = player_up_2d * throttle;
+            force.add_force(add_force.x, add_force.y);
         }
     }
 }
-
-
-Components
-Player
-Mass
-Force
-Acceleration
-Velocity
-Transform

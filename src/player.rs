@@ -1,4 +1,4 @@
-use crate::components::{Acceleration, Force, Mass, Velocity};
+use crate::components::{Acceleration, Force, Mass, Player, Velocity};
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::transform::Transform,
@@ -28,14 +28,17 @@ pub fn load_sprite_sheet(world: &World) -> Handle<SpriteSheet> {
 }
 
 pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-    let mut player_transform = Transform::default();
+    let mut transform = Transform::default();
 
+    let player = Player {
+        forward_thrust_power: 10.0,
+    };
     let mass = Mass::new(10.0);
-    let force = Force::new(1.0, 1.0);
+    let force = Force::new(0.0, 0.0);
     let velocity = Velocity::new(0.0, 0.0);
     let acceleration = Acceleration::new(0.0, 0.0);
     //Position the player
-    player_transform.set_translation_xyz(50.0, 50.0, 0.0);
+    transform.set_translation_xyz(50.0, 50.0, 0.0);
 
     //Sprite renderer
     let sprite_render = SpriteRender {
@@ -45,10 +48,11 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
 
     world
         .create_entity()
-        .with(player_transform)
+        .with(transform)
         .with(velocity)
         .with(acceleration)
         .with(mass)
+        .with(player)
         .with(force)
         .with(sprite_render)
         .build();

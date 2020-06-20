@@ -14,4 +14,9 @@ impl Force{
             force: Vector2::new(x, y),
         }
     }    
+
+    pub fn add_force(&mut self, x: f32, y: f32) {
+        self.force.x += x;
+        self.force.y += y;
+    }
 }

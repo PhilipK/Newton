@@ -1,0 +1,7 @@
+(
+  axes: {
+    "rotation": Emulated(pos: Key(A), neg: Key(D)),
+    "throttle": Emulated(pos: Key(W), neg: Key(S)),
+  },
+  actions: {},
+)
