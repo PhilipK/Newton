@@ -31,7 +31,7 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
     let mut player_transform = Transform::default();
 
     let mass = Mass::new(10.0);
-    let force = Force::new(100.0, -10.0);
+    let force = Force::new(1.0, 1.0);
     let velocity = Velocity::new(0.0, 0.0);
     let acceleration = Acceleration::new(0.0, 0.0);
     //Position the player
@@ -50,6 +50,6 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
         .with(acceleration)
         .with(mass)
         .with(force)
-        .with(sprite_render.clone())
+        .with(sprite_render)
         .build();
 }

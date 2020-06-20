@@ -19,7 +19,7 @@ impl<'s> System<'s> for ForceToAcceletationSystem {
         for (acceleration, force, mass) in (&mut accelerations, &mut forces, &masses).join() {
             let delta_acc = force.force * mass.mass;
             acceleration.add_acceleration(delta_acc.x, delta_acc.y);
-            force.force = force.force * 0.0;
+            force.force *= 0.0;
         }
     }
 }

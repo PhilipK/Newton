@@ -32,7 +32,7 @@ fn main() -> amethyst::Result<()> {
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.0, 0.168627451, 0.2117647059, 1.0]),
+                        .with_clear([0.0, 0.16, 0.21, 1.0]),
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
