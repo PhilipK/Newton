@@ -7,3 +7,11 @@ pub struct Force {
 impl Component for Force {
     type Storage = DenseVecStorage<Self>;
 }
+
+impl Force{
+    pub fn new(x: f32, y: f32) -> Self {
+        Force {
+            force: Vector2::new(x, y),
+        }
+    }    
+}

@@ -38,7 +38,8 @@ fn main() -> amethyst::Result<()> {
         )?
         .with_bundle(TransformBundle::new())?
         .with(systems::VelocityToTransformSystem, "velocity_to_transform_system", &[])
-        .with(systems::AccelerationToVelocitySystem, "acceleration_to_velocity_system", &["velocity_to_transform_system"]);
+        .with(systems::AccelerationToVelocitySystem, "acceleration_to_velocity_system", &["velocity_to_transform_system"])
+        .with(systems::ForceToAcceletationSystem, "force_to_acceleration", &["acceleration_to_velocity_system"]);
 
     let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
     game.run();

@@ -15,4 +15,9 @@ impl Acceleration {
             acceleration: Vector2::new(x, y),
         }
     }
+
+    pub fn add_acceleration(self: &mut Self, x: f32, y: f32) {
+        let old = self.acceleration;
+        self.acceleration = Vector2::new(x + old.x, y + old.y);
+    }
 }

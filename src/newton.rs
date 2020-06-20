@@ -1,13 +1,10 @@
 use crate::player;
 use crate::playercamera;
-use amethyst::core::timing::Time;
+
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
-    core::transform::Transform,
-    ecs::prelude::{Component, DenseVecStorage, Entity},
-    prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
+    assets::{Handle},
+    prelude::{GameData, SimpleState, StateData},
+    renderer::{SpriteSheet},
 };
 
 #[derive(Default)]

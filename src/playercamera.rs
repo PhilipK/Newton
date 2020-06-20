@@ -1,11 +1,8 @@
-use amethyst::core::timing::Time;
+
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
     core::transform::Transform,
-    ecs::prelude::{Component, DenseVecStorage, Entity},
     prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
+    renderer::{Camera},
 };
 
 pub const CAMERA_HEIGHT: f32 = 100.0;
