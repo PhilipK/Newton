@@ -46,6 +46,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
+        .with(systems::CameraSystem, "camera_system", &[])
         .with(systems::GravitySystem, "gravity", &[])
         .with(
             systems::ForceToAcceletationSystem,

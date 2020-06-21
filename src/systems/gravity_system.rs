@@ -1,15 +1,14 @@
+use crate::components::Force;
+use crate::components::Mass;
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
-use amethyst::ecs::join::ParJoin;
-use crate::components::Force;
-use crate::components::Mass;
 
 #[derive(SystemDesc)]
 pub struct GravitySystem;
 
 const GRAVITATIONAL_CONSTANT: f32 = 1.0;
-const MAX_DISTANCE: f32 = 1000.0 * 1000.0;
+// const MAX_DISTANCE: f32 = 1000.0 * 1000.0;
 
 impl<'s> System<'s> for GravitySystem {
     type SystemData = (
@@ -24,7 +23,6 @@ impl<'s> System<'s> for GravitySystem {
     /// F = G * (m1*m2)/(r*r)
     fn run(&mut self, (mut forces, masses, transforms, time): Self::SystemData) {
         let delta_time = time.delta_seconds();
-        let mut i = 0;
         for (force1, mass1, transform1) in (&mut forces, &masses, &transforms).join() {
             let translate1 = transform1.translation();
             for (mass2, transform2) in (&masses, &transforms).join() {
@@ -33,17 +31,15 @@ impl<'s> System<'s> for GravitySystem {
                     let distance_squared = (translate1.x - translate2.x)
                         * (translate1.x - translate2.x)
                         + (translate1.y - translate2.y) * (translate1.y - translate2.y);
-                    if  distance_squared > 0.0 {
+                    if distance_squared > 0.0 {
                         let forceg =
                             GRAVITATIONAL_CONSTANT * (mass1.mass * mass2.mass / distance_squared);
                         let direction = translate2 - translate1;
                         let forceg_timed = forceg * delta_time * direction;
                         force1.add_force(forceg_timed.x, forceg_timed.y);
-                        i += 1;
                     }
                 }
             }
         }
-        println!("{}", i);
     }
 }
