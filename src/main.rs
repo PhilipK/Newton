@@ -34,18 +34,18 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
-                    RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.0, 0.16, 0.21, 1.0]),
+                    RenderToWindow::from_config_path(display_config_path)?.with_clear([
+                        0.0,
+                        0.16 / 4.0,
+                        0.21 / 4.0,
+                        1.0,
+                    ]),
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
-        .with(
-            systems::PlayerControlllerSystem,
-            "player_controller",
-            &[],
-        )
+        .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(
             systems::ForceToAcceletationSystem,
             "force_to_acceleration",
@@ -60,10 +60,7 @@ fn main() -> amethyst::Result<()> {
             systems::VelocityToTransformSystem,
             "velocity_to_transform_system",
             &["acceleration_to_velocity_system"],
-        )
-        
-        
-        ;
+        );
 
     let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
     game.run();
