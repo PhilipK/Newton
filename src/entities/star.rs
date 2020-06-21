@@ -1,4 +1,4 @@
-use crate::components::{Acceleration, Force, Mass, Velocity};
+use crate::components::{Acceleration, Force, Gravity, Mass, Velocity};
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::transform::Transform,
@@ -20,7 +20,7 @@ pub fn load_sprite_sheet(world: &World, name: &str) -> Handle<SpriteSheet> {
     let loader = world.read_resource::<Loader>();
     let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
     loader.load(
-        format!("texture/{}.ron", name),        
+        format!("texture/{}.ron", name),
         SpriteSheetFormat(texture_handle),
         (),
         &sprite_sheet_store,
@@ -37,7 +37,7 @@ pub fn initialize_star(
     sprite_sheet_handle: Handle<SpriteSheet>,
 ) {
     let mut transform = Transform::default();
-    let mass = Mass::new(mass);
+    let mass_comp = Mass::new(mass);
     let force = Force::new(0.0, 0.0);
     let velocity = Velocity::new(velocityx, velocityy);
     let acceleration = Acceleration::new(0.0, 0.0);
@@ -49,13 +49,16 @@ pub fn initialize_star(
         sprite_sheet: sprite_sheet_handle,
         sprite_number: 0, // default ship is 0
     };
-    world
+    let mut bundle = world
         .create_entity()
         .with(transform)
         .with(velocity)
         .with(acceleration)
-        .with(mass)
+        .with(mass_comp)
         .with(force)
-        .with(sprite_render)
-        .build();
+        .with(sprite_render);
+    if mass > 999.0 {
+        bundle = bundle.with(Gravity {});
+    }
+    bundle.build();
 }
