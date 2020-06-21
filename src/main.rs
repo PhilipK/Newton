@@ -11,9 +11,9 @@ use amethyst::{
 };
 
 mod newton;
-mod player;
 mod playercamera;
 
+mod entities;
 mod components;
 mod systems;
 
