@@ -31,14 +31,15 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
     let mut transform = Transform::default();
 
     let player = Player {
-        forward_thrust_power: 10.0,
+        forward_thrust_power: 10000.0,
+        turn_pr_second: 3.0,
     };
-    let mass = Mass::new(10.0);
+    let mass = Mass::new(1.0);
     let force = Force::new(0.0, 0.0);
     let velocity = Velocity::new(0.0, 0.0);
     let acceleration = Acceleration::new(0.0, 0.0);
     //Position the player
-    transform.set_translation_xyz(50.0, 50.0, 0.0);
+    transform.set_translation_xyz(200.0, 500.0, 0.0);
 
     //Sprite renderer
     let sprite_render = SpriteRender {

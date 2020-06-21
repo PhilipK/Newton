@@ -1,4 +1,3 @@
-use amethyst::core::math::Vector2;
 use amethyst::core::math::Vector3;
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
@@ -16,24 +15,28 @@ impl<'s> System<'s> for PlayerControlllerSystem {
     type SystemData = (
         WriteStorage<'s, Force>,
         ReadStorage<'s, Player>,
-        ReadStorage<'s, Transform>,
+        WriteStorage<'s, Transform>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut forces, players, tarnsforms, input, time): Self::SystemData) {
-        for (force, player, transform) in (&mut forces, &players, &tarnsforms).join() {
-            // let rotate = input.axis_value("rotate");
+    fn run(&mut self, (mut forces, players, mut tarnsforms, input, time): Self::SystemData) {
+        for (force, player, transform) in (&mut forces, &players, &mut tarnsforms).join() {
             let delta_time = time.delta_seconds();
-            let throttle = match input.axis_value("throttle") {
-                Some(value) => value * delta_time * player.forward_thrust_power,
-                None => 0.0,
-            };
+            if let Some(rotate_value) = input.axis_value("rotate") {
+                if rotate_value != 0.0 {
+                    transform.rotate_2d(rotate_value * delta_time * player.turn_pr_second);
+                }
+            }
 
-            let player_up_3d = transform.isometry().inverse().rotation * Vector3::y();
-            let player_up_2d = Vector2::new(player_up_3d.x, player_up_3d.y);
-            let add_force = player_up_2d * throttle;
-            force.add_force(add_force.x, add_force.y);
+            if let Some(value) = input.axis_value("throttle") {
+                if value != 0.0 {
+                    let throttle = value * delta_time * player.forward_thrust_power;
+                    let direction = transform.isometry().inverse().rotation * -Vector3::y();
+                    let add_force = direction * throttle;
+                    force.add_force(add_force.x, add_force.y * -1.0);
+                }
+            }
         }
     }
 }
