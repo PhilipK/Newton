@@ -27,22 +27,40 @@ impl SimpleState for Newton {
             1000000.0,
             500.0,
             500.0,
+            0.0,
+            0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
         );
         star::initialize_star(
             world,
-            100000.0,
+            100.0,
             700.0,
             700.0,
+            100.0,
+            -80.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
         );
-        star::initialize_star(
-            world,
-            100000.0,
-            200.0,
-            200.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
-        );
+        // star::initialize_star(
+        //     world,
+        //     100000.0,
+        //     200.0,
+        //     200.0,
+        //     self.star_sprite_sheet_handle.clone().unwrap(),
+        // );
+        // star::initialize_star(
+        //     world,
+        //     10000.0,
+        //     200.0,
+        //     500.0,
+        //     self.star_sprite_sheet_handle.clone().unwrap(),
+        // );
+        // star::initialize_star(
+        //     world,
+        //     10000.0,
+        //     500.0,
+        //     200.0,
+        //     self.star_sprite_sheet_handle.clone().unwrap(),
+        // );
         playercamera::initialize_camera(world);
         // initialise_scoreboard(world);
     }

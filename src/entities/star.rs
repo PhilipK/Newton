@@ -32,12 +32,14 @@ pub fn initialize_star(
     mass: f32,
     positionx: f32,
     positiony: f32,
+    velocityx: f32,
+    velocityy: f32,
     sprite_sheet_handle: Handle<SpriteSheet>,
 ) {
     let mut transform = Transform::default();
     let mass = Mass::new(mass);
     let force = Force::new(0.0, 0.0);
-    let velocity = Velocity::new(10.0, 10.0);
+    let velocity = Velocity::new(velocityx, velocityy);
     let acceleration = Acceleration::new(0.0, 0.0);
     //Position the player
     transform.set_translation_xyz(positionx, positiony, 0.0);
