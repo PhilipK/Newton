@@ -28,7 +28,6 @@ pub fn load_sprite_sheet(world: &World) -> Handle<SpriteSheet> {
 }
 
 pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-    let mut transform = Transform::default();
 
     let player = Player {
         forward_thrust_power: 10000.0,
@@ -38,6 +37,7 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
     let force = Force::new(0.0, 0.0);
     let velocity = Velocity::new(0.0, 0.0);
     let acceleration = Acceleration::new(0.0, 0.0);
+    let mut transform = Transform::default();
     //Position the player
     transform.set_translation_xyz(200.0, 500.0, 0.0);
 

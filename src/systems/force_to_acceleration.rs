@@ -17,7 +17,7 @@ impl<'s> System<'s> for ForceToAcceletationSystem {
 
     fn run(&mut self, (mut accelerations, mut forces, masses): Self::SystemData) {        
         for (acceleration, force, mass) in (&mut accelerations, &mut forces, &masses).join() {
-            let delta_acc = force.force * mass.mass;
+            let delta_acc = force.force / mass.mass;
             acceleration.add_acceleration(delta_acc.x, delta_acc.y);
             force.force *= 0.0;
         }

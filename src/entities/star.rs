@@ -27,15 +27,20 @@ pub fn load_sprite_sheet(world: &World) -> Handle<SpriteSheet> {
     )
 }
 
-pub fn initialize_star(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
+pub fn initialize_star(
+    world: &mut World,
+    mass: f32,
+    positionx: f32,
+    positiony: f32,
+    sprite_sheet_handle: Handle<SpriteSheet>,
+) {
     let mut transform = Transform::default();
-    
-    let mass = Mass::new(10000.0);
+    let mass = Mass::new(mass);
     let force = Force::new(0.0, 0.0);
-    let velocity = Velocity::new(0.0, 0.0);
+    let velocity = Velocity::new(10.0, 10.0);
     let acceleration = Acceleration::new(0.0, 0.0);
     //Position the player
-    transform.set_translation_xyz(100.0, 700.0, 0.0);
+    transform.set_translation_xyz(positionx, positiony, 0.0);
 
     //Sprite renderer
     let sprite_render = SpriteRender {

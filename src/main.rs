@@ -13,8 +13,8 @@ use amethyst::{
 mod newton;
 mod playercamera;
 
-mod entities;
 mod components;
+mod entities;
 mod systems;
 
 fn main() -> amethyst::Result<()> {
@@ -46,10 +46,11 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
+        .with(systems::GravitySystem, "gravity", &[])
         .with(
             systems::ForceToAcceletationSystem,
             "force_to_acceleration",
-            &["player_controller"],
+            &["player_controller","gravity"],
         )
         .with(
             systems::AccelerationToVelocitySystem,
