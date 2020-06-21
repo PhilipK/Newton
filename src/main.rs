@@ -46,12 +46,11 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
-        .with(systems::CameraSystem, "camera_system", &[])
         .with(systems::GravitySystem, "gravity", &[])
         .with(
             systems::ForceToAcceletationSystem,
             "force_to_acceleration",
-            &["player_controller","gravity"],
+            &["player_controller", "gravity"],
         )
         .with(
             systems::AccelerationToVelocitySystem,
@@ -62,6 +61,11 @@ fn main() -> amethyst::Result<()> {
             systems::VelocityToTransformSystem,
             "velocity_to_transform_system",
             &["acceleration_to_velocity_system"],
+        )
+        .with(
+            systems::CameraSystem,
+            "camera_system",
+            &["velocity_to_transform_system"],
         );
 
     let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;

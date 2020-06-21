@@ -2,7 +2,9 @@ use crate::components::Force;
 use crate::components::Mass;
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
+use amethyst::ecs::prelude::ParallelIterator;
+
+use amethyst::ecs::{ParJoin,Join, Read, ReadStorage, System, SystemData, WriteStorage};
 
 #[derive(SystemDesc)]
 pub struct GravitySystem;
@@ -23,23 +25,25 @@ impl<'s> System<'s> for GravitySystem {
     /// F = G * (m1*m2)/(r*r)
     fn run(&mut self, (mut forces, masses, transforms, time): Self::SystemData) {
         let delta_time = time.delta_seconds();
-        for (force1, mass1, transform1) in (&mut forces, &masses, &transforms).join() {
-            let translate1 = transform1.translation();
-            for (mass2, transform2) in (&masses, &transforms).join() {
-                if transform1 != transform2 {
-                    let translate2 = transform2.translation();
-                    let distance_squared = (translate1.x - translate2.x)
-                        * (translate1.x - translate2.x)
-                        + (translate1.y - translate2.y) * (translate1.y - translate2.y);
-                    if distance_squared > 0.0 {
-                        let forceg =
-                            GRAVITATIONAL_CONSTANT * (mass1.mass * mass2.mass / distance_squared);
-                        let direction = translate2 - translate1;
-                        let forceg_timed = forceg * delta_time * direction;
-                        force1.add_force(forceg_timed.x, forceg_timed.y);
+        (&mut forces, &masses, &transforms)
+            .par_join()
+            .for_each(|(force1, mass1, transform1)| {
+                let translate1 = transform1.translation();
+                for (mass2, transform2) in (&masses, &transforms).join() {
+                    if transform1 != transform2 {
+                        let translate2 = transform2.translation();
+                        let distance_squared = (translate1.x - translate2.x)
+                            * (translate1.x - translate2.x)
+                            + (translate1.y - translate2.y) * (translate1.y - translate2.y);
+                        if distance_squared > 0.0 {
+                            let forceg = GRAVITATIONAL_CONSTANT
+                                * (mass1.mass * mass2.mass / distance_squared);
+                            let direction = translate2 - translate1;
+                            let forceg_timed = forceg * delta_time * direction;
+                            force1.add_force(forceg_timed.x, forceg_timed.y);
+                        }
                     }
                 }
-            }
-        }
+            });
     }
 }
