@@ -1,7 +1,7 @@
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
-
+use amethyst::ecs::join::ParJoin;
 use crate::components::Force;
 use crate::components::Mass;
 
