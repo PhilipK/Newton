@@ -29,7 +29,7 @@ impl SimpleState for Newton {
             .replace(star::load_sprite_sheet(world, "meteor"));
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
-        let meteor_number = 1000;
+        let meteor_number = 10;
         for i in 0..meteor_number {
             star::initialize_star(
                 world,
