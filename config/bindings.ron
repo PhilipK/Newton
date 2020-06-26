@@ -2,6 +2,7 @@
   axes: {
     "rotate": Emulated(pos: Key(D), neg: Key(A)),
     "throttle": Emulated(pos: Key(W), neg: Key(S)),
+    "zoom": Emulated(pos: Key(R), neg: Key(F)),
   },
   actions: {},
 )
