@@ -3,7 +3,6 @@ use crate::components::ZoomCamera;
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::{
-    core::timing::Time,
     core::Transform,
     derive::SystemDesc,
     ecs::{Entities, Join, Read, ReadStorage, System, SystemData, WriteStorage},
@@ -20,16 +19,16 @@ impl<'s> System<'s> for CameraSystem {
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Player>,
         Read<'s, InputHandler<StringBindings>>,
-        Read<'s, Time>,
         Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (mut cameras, mut zoom_cameras, mut transforms, players, input, time, entities): Self::SystemData,
+        (mut cameras, mut zoom_cameras, mut transforms, players, input, entities): Self::SystemData,
     ) {
-        let delta_time = time.delta_seconds();
-        let zoom_speed = 2.0;
+        let zoom_speed = 0.5;
+        let max_zoom_level = 10.0;
+        let min_zoom_level = 0.5;
 
         for (player_entity, _player) in (&entities, &players).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
@@ -39,7 +38,11 @@ impl<'s> System<'s> for CameraSystem {
                 {
                     if let Some(camera_transform) = transforms.get_mut(camera_entity) {
                         if let Some(zoom_axis) = input.axis_value("zoom") {
-                            zoom_camera.zoom_level += zoom_axis * delta_time * zoom_speed;
+                            zoom_camera.zoom_level = clamp(
+                                zoom_camera.zoom_level + (zoom_axis * -1.0) * zoom_speed,
+                                min_zoom_level,
+                                max_zoom_level,
+                            );
                             let scaled_projection =
                                 get_scaled_camera_projection(zoom_camera.zoom_level);
                             camera.set_projection(scaled_projection);
@@ -54,6 +57,16 @@ impl<'s> System<'s> for CameraSystem {
             }
         }
     }
+}
+
+fn clamp(input: f32, min: f32, max: f32) -> f32 {
+    if input < min {
+        return min;
+    }
+    if input > max {
+        return max;
+    }
+    input
 }
 
 fn get_scaled_camera_projection(scale: f32) -> Projection {
