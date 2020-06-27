@@ -3,7 +3,7 @@ use amethyst::{
     input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
+        plugins::{RenderDebugLines, RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
     },
@@ -16,6 +16,8 @@ mod playercamera;
 mod components;
 mod entities;
 mod systems;
+
+mod utils;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -41,10 +43,12 @@ fn main() -> amethyst::Result<()> {
                         1.0,
                     ]),
                 )
-                .with_plugin(RenderFlat2D::default()),
+                .with_plugin(RenderFlat2D::default())
+                .with_plugin(RenderDebugLines::default()),
         )?
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
+        .with(systems::PlayerCollisionSystem, "player_collision", &[])
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(systems::GravitySystem, "gravity", &[])
         .with(

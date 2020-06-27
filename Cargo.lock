@@ -1890,6 +1890,8 @@ name = "newton"
 version = "0.1.0"
 dependencies = [
  "amethyst",
+ "amethyst_core",
+ "amethyst_rendy",
 ]
 
 [[package]]

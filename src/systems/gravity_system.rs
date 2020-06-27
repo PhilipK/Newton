@@ -1,10 +1,10 @@
 use crate::components::Force;
 use crate::components::Gravity;
 use crate::components::Mass;
+use crate::utils::distance_squared;
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::prelude::ParallelIterator;
-
 use amethyst::ecs::{Join, ParJoin, Read, ReadStorage, System, SystemData, WriteStorage};
 
 #[derive(SystemDesc)]
@@ -34,9 +34,7 @@ impl<'s> System<'s> for GravitySystem {
                 for (mass2, transform2, _gravity) in (&masses, &transforms, &gravities).join() {
                     if transform1 != transform2 {
                         let translate2 = transform2.translation();
-                        let distance_squared = (translate1.x - translate2.x)
-                            * (translate1.x - translate2.x)
-                            + (translate1.y - translate2.y) * (translate1.y - translate2.y);
+                        let distance_squared = distance_squared(transform1, transform2);
                         if distance_squared > 0.0 {
                             let forceg = GRAVITATIONAL_CONSTANT
                                 * (mass1.mass * mass2.mass / distance_squared);

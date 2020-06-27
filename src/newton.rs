@@ -34,6 +34,7 @@ impl SimpleState for Newton {
             star::initialize_star(
                 world,
                 10.0,
+                16.0, 
                 (10000.0 / meteor_number as f32) * (i as f32),
                 (10000.0 / meteor_number as f32) * (i as f32),
                 0.0,
@@ -45,6 +46,7 @@ impl SimpleState for Newton {
         star::initialize_star(
             world,
             1000000.0,
+            64.0,
             200.0,
             200.0,
             -100.0,
@@ -55,6 +57,7 @@ impl SimpleState for Newton {
         star::initialize_star(
             world,
             1000000.0,
+            64.0,
             700.0,
             700.0,
             100.0,
@@ -64,6 +67,7 @@ impl SimpleState for Newton {
         star::initialize_star(
             world,
             1000.0,
+            32.0,
             800.0,
             800.0,
             100.0,
@@ -73,6 +77,7 @@ impl SimpleState for Newton {
         star::initialize_star(
             world,
             1000.0,
+            32.0,
             100.0,
             100.0,
             -100.0,

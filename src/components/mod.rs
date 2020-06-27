@@ -5,6 +5,7 @@ pub use self::player::Player;
 pub use self::velocity::Velocity;
 pub use self::gravity::Gravity;
 pub use self::zoom_camera::ZoomCamera;
+pub use self::planet::Planet;
 
 mod acceleration;
 mod force;
@@ -13,3 +14,4 @@ mod player;
 mod velocity;
 mod gravity;
 mod zoom_camera;
+mod planet;
