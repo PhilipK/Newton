@@ -31,6 +31,8 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
 
     let player = Player {
         forward_thrust_power: 10000.0,
+        backwards_thrust_power: 5000.0,
+        sideways_thrust_power: 5000.0,
         turn_pr_second: 3.0,
     };
     let mass = Mass::new(1.0);
