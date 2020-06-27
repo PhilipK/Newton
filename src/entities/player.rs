@@ -28,12 +28,12 @@ pub fn load_sprite_sheet(world: &World) -> Handle<SpriteSheet> {
 }
 
 pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-
     let player = Player {
         forward_thrust_power: 10000.0,
         backwards_thrust_power: 3333.0,
         sideways_thrust_power: 5000.0,
         turn_pr_second: 3.0,
+        is_dead: false,
     };
     let mass = Mass::new(1.0);
     let force = Force::new(0.0, 0.0);
