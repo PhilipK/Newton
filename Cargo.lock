@@ -1892,6 +1892,7 @@ dependencies = [
  "amethyst",
  "amethyst_core",
  "amethyst_rendy",
+ "rand 0.7.3",
 ]
 
 [[package]]

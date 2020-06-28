@@ -2,6 +2,7 @@ use crate::components::{Player, ScoreArea};
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Entities, Join, Read, ReadStorage, System, SystemData, WriteStorage};
+use rand::Rng;
 
 #[derive(SystemDesc)]
 pub struct ScoreSystem;
@@ -20,6 +21,7 @@ impl<'s> System<'s> for ScoreSystem {
         (players, mut transforms, mut score_areas, time, entities): Self::SystemData,
     ) {
         let delta_seconds = time.delta_seconds();
+        let mut rng = rand::thread_rng();
         for (_player, player_entity) in (&players, &entities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
                 let player_position = player_transform.clone();
@@ -30,7 +32,11 @@ impl<'s> System<'s> for ScoreSystem {
                             println!("time: {}", score_area.time_left);
                             if score_area.time_left <= 0.0 {
                                 score_area.time_left = 3.0;
-                                score_area_transform.set_translation_xyz(200.0, 400.0, 0.0);
+                                score_area_transform.set_translation_xyz(
+                                    rng.gen::<f32>() * 2000.0 - 1000.0,
+                                    rng.gen::<f32>() * 2000.0 - 1000.0,
+                                    0.0,
+                                );
                             }
                         }
                     }

@@ -8,6 +8,7 @@ edition = "2018"
 amethyst = "0.15.0"
 amethyst_rendy = "0.5.0"
 amethyst_core = "0.10.0"
+rand = "0.7.3"
 
 [features]
 default = ["vulkan"]
