@@ -1,10 +1,11 @@
 use crate::components::Player;
 use crate::entities::player;
+use crate::entities::score_area;
 use crate::entities::star;
 use crate::playercamera;
+use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
 use amethyst::ecs::{Join, ReadStorage};
-use amethyst::input::{is_key_down, VirtualKeyCode};
 
 use amethyst::prelude::*;
 
@@ -20,6 +21,7 @@ pub struct Newton {
     star_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     earth_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+    score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl Newton {
@@ -29,6 +31,7 @@ impl Newton {
             star_sprite_sheet_handle: Option::None,
             earth_sprite_sheet_handle: Option::None,
             meteor_sprite_sheet_handle: Option::None,
+            score_area_sprite_sheet_handle: Option::None,
         }
     }
 }
@@ -37,13 +40,16 @@ impl SimpleState for Newton {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         self.player_sprite_sheet_handle
-            .replace(player::load_sprite_sheet(world));
+            .replace(load_sprite_sheet(world, "player_spritesheet"));
         self.star_sprite_sheet_handle
-            .replace(star::load_sprite_sheet(world, "star"));
+            .replace(load_sprite_sheet(world, "star"));
         self.earth_sprite_sheet_handle
-            .replace(star::load_sprite_sheet(world, "earth"));
+            .replace(load_sprite_sheet(world, "earth"));
         self.meteor_sprite_sheet_handle
-            .replace(star::load_sprite_sheet(world, "meteor"));
+            .replace(load_sprite_sheet(world, "meteor"));
+        self.score_area_sprite_sheet_handle
+            .replace(load_sprite_sheet(world, "score_area"));
+
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
         let meteor_number = 10;
@@ -101,6 +107,8 @@ impl SimpleState for Newton {
             80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
         );
+
+        score_area::initialize_score_area(world, self.score_area_sprite_sheet_handle.clone().unwrap());
         playercamera::initialize_camera(world);
         // initialise_scoreboard(world);
     }

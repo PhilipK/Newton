@@ -51,6 +51,7 @@ fn main() -> amethyst::Result<()> {
         .with(systems::PlayerCollisionSystem, "player_collision", &[])
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(systems::GravitySystem, "gravity", &[])
+        .with(systems::ScoreSystem, "score_system", &[])
         .with(
             systems::ForceToAcceletationSystem,
             "force_to_acceleration",
