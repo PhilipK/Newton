@@ -1,7 +1,11 @@
 use crate::components::{Player, ScoreArea};
+use crate::entities::score_board::{ScoreBoard, ScoreText};
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Entities, Join, Read, ReadStorage, System, SystemData, WriteStorage};
+use amethyst::ecs::{
+    Entities, Join, Read, ReadExpect, ReadStorage, System, SystemData, Write, WriteStorage,
+};
+use amethyst::ui::UiText;
 use rand::Rng;
 
 #[derive(SystemDesc)]
@@ -14,11 +18,23 @@ impl<'s> System<'s> for ScoreSystem {
         WriteStorage<'s, ScoreArea>,
         Read<'s, Time>,
         Entities<'s>,
+        Write<'s, ScoreBoard>,
+        WriteStorage<'s, UiText>,
+        ReadExpect<'s, ScoreText>,
     );
 
     fn run(
         &mut self,
-        (players, mut transforms, mut score_areas, time, entities): Self::SystemData,
+        (
+            players,
+            mut transforms,
+            mut score_areas,
+            time,
+            entities,
+            mut score_board,
+            mut ui_texts,
+            score_text,
+        ): Self::SystemData,
     ) {
         let delta_seconds = time.delta_seconds();
         let mut rng = rand::thread_rng();
@@ -37,6 +53,9 @@ impl<'s> System<'s> for ScoreSystem {
                                     rng.gen::<f32>() * 2000.0 - 1000.0,
                                     0.0,
                                 );
+                                score_board.score += 1;
+                                let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
+                                score_ui_text.text = score_board.score.to_string();
                             }
                         }
                     }

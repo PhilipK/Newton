@@ -1,6 +1,7 @@
 use crate::components::Player;
 use crate::entities::player;
 use crate::entities::score_area;
+use crate::entities::score_board;
 use crate::entities::star;
 use crate::playercamera;
 use crate::utils::load_sprite_sheet;
@@ -39,6 +40,8 @@ impl Newton {
 impl SimpleState for Newton {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+        score_board::initialise_scoreboard(world);
+
         self.player_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "player_spritesheet"));
         self.star_sprite_sheet_handle
@@ -107,24 +110,25 @@ impl SimpleState for Newton {
             80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
         );
-
-        score_area::initialize_score_area(world, self.score_area_sprite_sheet_handle.clone().unwrap());
+        score_area::initialize_score_area(
+            world,
+            self.score_area_sprite_sheet_handle.clone().unwrap(),
+        );
         playercamera::initialize_camera(world);
-        // initialise_scoreboard(world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let system_data: Entities = data.world.system_data();
         for entity in (&system_data).join() {
-            system_data.delete(entity);
+            let _unused = system_data.delete(entity);
         }
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let system_data: ReadStorage<Player> = data.world.system_data();
-        for (player) in (&system_data).join() {
-            if (player.is_dead) {
-                return Trans::Replace(Box::new((Newton::new())));
+        for player in (&system_data).join() {
+            if player.is_dead {
+                return Trans::Replace(Box::new(Newton::new()));
             }
         }
 

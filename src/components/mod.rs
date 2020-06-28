@@ -5,6 +5,7 @@ pub use self::mass::Mass;
 pub use self::planet::Planet;
 pub use self::player::Player;
 pub use self::score_area::ScoreArea;
+pub use self::score_board::ScoreBoard;
 pub use self::velocity::Velocity;
 pub use self::zoom_camera::ZoomCamera;
 
@@ -15,5 +16,6 @@ mod mass;
 mod planet;
 mod player;
 mod score_area;
+mod score_board;
 mod velocity;
 mod zoom_camera;
