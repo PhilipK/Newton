@@ -56,7 +56,6 @@ impl<'s> System<'s> for PlayerCollisionSystem {
                     // debug_lines_resource.draw_line(center, player_center, orangeish);
                     let distance_sqrt = distance_squared(player_transform, planet_transform);
                     if distance_sqrt <= planet.radius_squared + PLAYER_RADIUS_SQUARED {
-                        println!("Collision");
                         player.is_dead = true;
                         score_board.score = 0;
                     }

@@ -45,7 +45,6 @@ impl<'s> System<'s> for ScoreSystem {
                     if let Some(score_area_transform) = transforms.get_mut(score_entity) {
                         if is_in_box(&player_position, score_area_transform, 64.0, 128.0) {
                             score_area.time_left -= delta_seconds;
-                            println!("time: {}", score_area.time_left);
                             if score_area.time_left <= 0.0 {
                                 score_area.time_left = 3.0;
                                 score_area_transform.set_translation_xyz(
