@@ -43,8 +43,8 @@ impl<'s> System<'s> for ScoreSystem {
 fn is_in_box(player: &Transform, score: &Transform, height: f32, width: f32) -> bool {
     let pt = player.translation();
     let sat = score.translation();
-    sat.x - width <= pt.x
-        && pt.x <= sat.x + width
-        && sat.y - height <= pt.y
-        && pt.y <= sat.y + height
+    sat.x - width * 0.5 <= pt.x
+        && pt.x <= sat.x + width * 0.5
+        && sat.y - height * 0.5 <= pt.y
+        && pt.y <= sat.y + height * 0.5
 }
