@@ -1,10 +1,11 @@
 use crate::components::Planet;
 use crate::components::Player;
+use crate::entities::score_board::ScoreBoard;
 use crate::utils::distance_squared;
 
 use amethyst::core::Transform;
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Entities, Join, ReadStorage, System, SystemData, WriteStorage};
+use amethyst::ecs::{Entities, Join, ReadStorage, System, SystemData, Write, WriteStorage};
 // use amethyst::ecs::{Write};
 // use amethyst::renderer::debug_drawing::DebugLines;
 // use amethyst_core::math::Point3;
@@ -20,7 +21,7 @@ impl<'s> System<'s> for PlayerCollisionSystem {
         ReadStorage<'s, Transform>,
         ReadStorage<'s, Planet>,
         Entities<'s>,
-        // Write<'s, DebugLines>, // Request DebugLines resource
+        Write<'s, ScoreBoard>, // Write<'s, DebugLines>, // Request DebugLines resource
     );
 
     fn run(
@@ -30,6 +31,7 @@ impl<'s> System<'s> for PlayerCollisionSystem {
             transforms,
             planets,
             entities, // , mut debug_lines_resource
+            mut score_board,
         ): Self::SystemData,
     ) {
         //There should only be 1 player
@@ -56,6 +58,7 @@ impl<'s> System<'s> for PlayerCollisionSystem {
                     if distance_sqrt <= planet.radius_squared + PLAYER_RADIUS_SQUARED {
                         println!("Collision");
                         player.is_dead = true;
+                        score_board.score = 0;
                     }
                 }
             }

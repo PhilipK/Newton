@@ -2,6 +2,7 @@ use crate::components::Player;
 use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
+use crate::entities::score_board::ScoreBoard;
 use crate::entities::star;
 use crate::playercamera;
 use crate::utils::load_sprite_sheet;
@@ -118,7 +119,7 @@ impl SimpleState for Newton {
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();
+        let system_data: Entities = data.world.system_data();        
         for entity in (&system_data).join() {
             let _unused = system_data.delete(entity);
         }
