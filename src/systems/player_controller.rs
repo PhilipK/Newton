@@ -30,23 +30,10 @@ impl<'s> System<'s> for PlayerControlllerSystem {
             }
 
             if let Some(value) = input.axis_value("throttle") {
-                if value != 0.0 {
-                    let power = match value {
-                        value if value > 0.0 => player.forward_thrust_power,
-                        value if value < 0.0 => player.backwards_thrust_power,
-                        _ => 0.0,
-                    };
+                if value > 0.0 {
+                    let power = player.forward_thrust_power;
                     let throttle = value * delta_time * power;
                     let direction = transform.isometry().inverse().rotation * -Vector3::y();
-                    let add_force = direction * throttle;
-                    force.add_force(add_force.x, add_force.y * -1.0);
-                }
-            }
-            if let Some(value) = input.axis_value("sidethrottle") {
-                if value != 0.0 {
-                    let power = player.sideways_thrust_power;
-                    let throttle = value * delta_time * power;
-                    let direction = transform.isometry().inverse().rotation * Vector3::x();
                     let add_force = direction * throttle;
                     force.add_force(add_force.x, add_force.y * -1.0);
                 }

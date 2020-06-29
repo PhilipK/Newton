@@ -2,7 +2,6 @@
   axes: {
     "rotate": Emulated(pos: Key(D), neg: Key(A)),
     "throttle": Emulated(pos: Key(W), neg: Key(S)),
-    "sidethrottle": Emulated(pos: Key(E), neg: Key(Q)),
     "zoom": MouseWheel(horizontal: false),
   },
   actions: {},
