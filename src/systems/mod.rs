@@ -6,8 +6,10 @@ pub use self::player_collision_system::PlayerCollisionSystem;
 pub use self::player_controller::PlayerControlllerSystem;
 pub use self::score_system::ScoreSystem;
 pub use self::velocity_to_transform::VelocityToTransformSystem;
+pub use self::player_animation_system::PlayerAnimationSystem;
 
 mod acceleration_to_velocity;
+mod player_animation_system;
 mod camera;
 mod force_to_acceleration;
 mod gravity_system;

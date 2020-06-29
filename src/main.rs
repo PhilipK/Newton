@@ -53,6 +53,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(UiBundle::<StringBindings>::new())?
         .with(systems::PlayerCollisionSystem, "player_collision", &[])
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
+        .with(systems::PlayerAnimationSystem, "player_animation", &[])
         .with(systems::GravitySystem, "gravity", &[])
         .with(systems::ScoreSystem, "score_system", &[])
         .with(
