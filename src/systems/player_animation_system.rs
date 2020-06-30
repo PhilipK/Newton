@@ -17,11 +17,15 @@ impl<'s> System<'s> for PlayerAnimationSystem {
     );
 
     fn run(&mut self, (players, mut renderers, input, time): Self::SystemData) {
+        let steps_pr_second = 10.0;
+        let animation_steps = 4;
         for (_player, renderer) in (&players, &mut renderers).join() {
             if let Some(value) = input.axis_value("throttle") {
                 if value > 0.0 {
                     let absolute_seconds = time.absolute_time_seconds();
-                    let seconds = (((absolute_seconds * 10.0).round() as u32) % 4 + 1) as usize;
+                    let seconds = (((absolute_seconds * steps_pr_second).round() as u32)
+                        % animation_steps
+                        + 1) as usize;
                     renderer.sprite_number = seconds;
                 } else {
                     renderer.sprite_number = 0;
