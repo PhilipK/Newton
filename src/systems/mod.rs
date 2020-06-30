@@ -8,7 +8,9 @@ pub use self::score_system::ScoreSystem;
 pub use self::velocity_to_transform::VelocityToTransformSystem;
 pub use self::player_animation_system::PlayerAnimationSystem;
 pub use self::score_arrow_system::ScoreArrowSystem;
+pub use self::simple_animation_system::SimpleAnimationSystem;
 
+mod simple_animation_system;
 mod acceleration_to_velocity;
 mod player_animation_system;
 mod camera;

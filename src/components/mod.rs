@@ -7,6 +7,7 @@ pub use self::player::Player;
 pub use self::score_area::ScoreArea;
 pub use self::score_arrow::ScoreArrow;
 pub use self::score_board::ScoreBoard;
+pub use self::simple_animation::SimpleAnimation;
 pub use self::velocity::Velocity;
 pub use self::zoom_camera::ZoomCamera;
 
@@ -19,5 +20,6 @@ mod player;
 mod score_area;
 mod score_arrow;
 mod score_board;
+mod simple_animation;
 mod velocity;
 mod zoom_camera;

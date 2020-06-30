@@ -1,5 +1,6 @@
 use crate::components::Player;
 use crate::components::ScoreArrow;
+use crate::components::SimpleAnimation;
 
 use crate::components::Velocity;
 use crate::entities::player;
@@ -197,7 +198,7 @@ pub fn spawn_score_arrow(
 
     let (x, y) = (target_x - cur_x, target_y - cur_y);
     let mag = ((x * x) + (y * y)).sqrt();
-    let speed = 500.0;
+    let speed = 50.0;
     let velocity = Velocity::new(x / mag * speed, y / mag * speed);
     let vel_vec = velocity.velocity;
     let forward = Vector2::new(0.0, 1.0);
@@ -207,7 +208,15 @@ pub fn spawn_score_arrow(
     //Sprite renderer
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle,
-        sprite_number: 3, // default ship is 0
+        sprite_number: 0, // default ship is 0
+    };
+
+    let animation = SimpleAnimation {
+        current_index: 0,
+        min_index: 0,
+        max_index: 4,
+        time_pr_index: 1.0 / 5.0,
+        time_left: 1.0 / 5.0,
     };
 
     return builder
@@ -215,5 +224,6 @@ pub fn spawn_score_arrow(
         .with(ScoreArrow {})
         .with(sprite_render)
         .with(velocity)
+        .with(animation)
         .build();
 }
