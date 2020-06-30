@@ -3,8 +3,11 @@ use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
 use crate::entities::score_board::ScoreBoard;
+
 use crate::entities::star;
 use crate::playercamera;
+use amethyst::core::transform::Transform;
+
 use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
 use amethyst::ecs::{Join, ReadStorage};
@@ -14,7 +17,7 @@ use amethyst::prelude::*;
 use amethyst::{
     assets::Handle,
     prelude::{GameData, SimpleState, SimpleTrans, StateData},
-    renderer::SpriteSheet,
+    renderer::{SpriteRender, SpriteSheet},
 };
 
 #[derive(Default)]
@@ -24,6 +27,7 @@ pub struct Newton {
     earth_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+    star_field_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl Newton {
@@ -34,6 +38,7 @@ impl Newton {
             earth_sprite_sheet_handle: Option::None,
             meteor_sprite_sheet_handle: Option::None,
             score_area_sprite_sheet_handle: Option::None,
+            star_field_sheet_handle: Option::None,
         }
     }
 }
@@ -53,6 +58,8 @@ impl SimpleState for Newton {
             .replace(load_sprite_sheet(world, "meteor"));
         self.score_area_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "score_area"));
+        self.star_field_sheet_handle
+            .replace(load_sprite_sheet(world, "star_field"));
 
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
@@ -115,11 +122,14 @@ impl SimpleState for Newton {
             world,
             self.score_area_sprite_sheet_handle.clone().unwrap(),
         );
+
+        initialize_star_field(world, self.star_field_sheet_handle.clone().unwrap());
+
         playercamera::initialize_camera(world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();        
+        let system_data: Entities = data.world.system_data();
         for entity in (&system_data).join() {
             let _unused = system_data.delete(entity);
         }
@@ -134,5 +144,29 @@ impl SimpleState for Newton {
         }
 
         Trans::None
+    }
+}
+fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
+    let width = 100;
+    let height = 100;
+    let offset = -100.0;
+    let sprite_size = 32.0;
+    for i in 0..(width * height) {
+        let mut transform = Transform::default();
+        transform.set_translation_xyz(
+            (i % width) as f32 * sprite_size + offset,
+            ((i / width) as u32) as f32 * sprite_size + offset,
+            -0.1,
+        );
+        //Sprite renderer
+        let sprite_render = SpriteRender {
+            sprite_sheet: sheet.clone(),
+            sprite_number: 0, // default ship is 0
+        };
+        world
+            .create_entity()
+            .with(transform)
+            .with(sprite_render)
+            .build();
     }
 }
