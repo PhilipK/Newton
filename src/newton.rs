@@ -59,7 +59,7 @@ impl SimpleState for Newton {
         self.score_area_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "score_area"));
         self.star_field_sheet_handle
-            .replace(load_sprite_sheet(world, "star_field"));
+            .replace(load_sprite_sheet(world, "star_field_big"));
 
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
@@ -147,10 +147,11 @@ impl SimpleState for Newton {
     }
 }
 fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
-    let width = 100;
-    let height = 100;
-    let offset = -100.0;
-    let sprite_size = 32.0;
+    let width = 20;
+    let height = 20;
+    let sprite_size = 512.0;
+    // let offset = -1.0 * (width as f32) / 2.0 * (height as f32) / 2.0 * sprite_size;
+    let offset = (width as f32) * -0.5 * sprite_size;
     for i in 0..(width * height) {
         let mut transform = Transform::default();
         transform.set_translation_xyz(
