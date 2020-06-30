@@ -1,5 +1,6 @@
 use crate::components::Player;
 use crate::components::ScoreArrow;
+
 use crate::components::Velocity;
 use crate::entities::player;
 use crate::entities::score_area;
@@ -7,6 +8,10 @@ use crate::entities::score_board;
 use crate::entities::star;
 use crate::playercamera;
 use crate::resources::initialise_sprite_resource;
+use amethyst::core::math::Matrix;
+use amethyst::core::math::angle;
+use amethyst::core::math::Vector2;
+use amethyst::core::math::Vector3;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
 
@@ -45,11 +50,6 @@ impl Newton {
             score_arrow_sheet_handle: Option::None,
         }
     }
-}
-
-#[derive(Default)]
-pub struct SheetsHolder {
-    score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl SimpleState for Newton {
@@ -194,13 +194,18 @@ pub fn spawn_score_arrow(
     let mut arrow_transform = Transform::default();
     let cur_x = current_pos.translation().x;
     let cur_y = current_pos.translation().y;
-    arrow_transform.set_translation_xyz(cur_x, cur_y, 0.0);
     let target_x = target_pos.translation().x;
     let target_y = target_pos.translation().y;
+    arrow_transform.set_translation_xyz(cur_x, cur_y, 0.0);
 
     let (x, y) = (target_x - cur_x, target_y - cur_y);
     let mag = ((x * x) + (y * y)).sqrt();
-    let speed = 500.0;
+    let speed = 100.0;
+    let velocity = Velocity::new(x / mag * speed, y / mag * speed);
+    let vel_vec = velocity.velocity;
+    let forward = Vector2::new(0.0, 1.0);
+    let angle = angle(&vel_vec, &forward);
+    arrow_transform.rotate_2d(angle);
 
     //Sprite renderer
     let sprite_render = SpriteRender {
@@ -212,6 +217,6 @@ pub fn spawn_score_arrow(
         .with(arrow_transform)
         .with(ScoreArrow {})
         .with(sprite_render)
-        .with(Velocity::new(x / mag * speed, y / mag * speed))
+        .with(velocity)
         .build();
 }
