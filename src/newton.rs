@@ -211,13 +211,7 @@ pub fn spawn_score_arrow(
         sprite_number: 0, // default ship is 0
     };
 
-    let animation = SimpleAnimation {
-        current_index: 0,
-        min_index: 0,
-        max_index: 4,
-        time_pr_index: 1.0 / 5.0,
-        time_left: 1.0 / 5.0,
-    };
+    let animation = SimpleAnimation::new(4, 5.0);
 
     return builder
         .with(arrow_transform)
