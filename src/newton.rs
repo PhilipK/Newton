@@ -84,6 +84,7 @@ impl SimpleState for Newton {
                 0.0,
                 0.0,
                 self.meteor_sprite_sheet_handle.clone().unwrap(),
+                1,
             );
         }
 
@@ -96,6 +97,7 @@ impl SimpleState for Newton {
             -100.0,
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
+            4,
         );
 
         star::initialize_star(
@@ -107,6 +109,7 @@ impl SimpleState for Newton {
             100.0,
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
+            4,
         );
         star::initialize_star(
             world,
@@ -117,6 +120,7 @@ impl SimpleState for Newton {
             100.0,
             -80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
+            1,
         );
         star::initialize_star(
             world,
@@ -127,6 +131,7 @@ impl SimpleState for Newton {
             -100.0,
             80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
+            1,
         );
         score_area::initialize_score_area(
             world,
@@ -198,7 +203,7 @@ pub fn spawn_score_arrow(
 
     let (x, y) = (target_x - cur_x, target_y - cur_y);
     let mag = ((x * x) + (y * y)).sqrt();
-    let speed = 50.0;
+    let speed = 250.0;
     let velocity = Velocity::new(x / mag * speed, y / mag * speed);
     let vel_vec = velocity.velocity;
     let forward = Vector2::new(0.0, 1.0);
@@ -211,7 +216,7 @@ pub fn spawn_score_arrow(
         sprite_number: 0, // default ship is 0
     };
 
-    let animation = SimpleAnimation::new(4, 5.0);
+    let animation = SimpleAnimation::new(5, 5);
 
     return builder
         .with(arrow_transform)

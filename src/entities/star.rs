@@ -1,9 +1,9 @@
-use crate::components::{Acceleration, Force, Gravity, Mass, Planet, Velocity};
+use crate::components::{Acceleration, Force, Gravity, Mass, Planet, SimpleAnimation, Velocity};
 use amethyst::{
-    assets::{ Handle},
+    assets::Handle,
     core::transform::Transform,
     prelude::{Builder, World, WorldExt},
-    renderer::{ SpriteRender, SpriteSheet},
+    renderer::{SpriteRender, SpriteSheet},
 };
 
 pub fn initialize_star(
@@ -15,6 +15,7 @@ pub fn initialize_star(
     velocityx: f32,
     velocityy: f32,
     sprite_sheet_handle: Handle<SpriteSheet>,
+    number_of_sprites: usize,
 ) {
     let radius_multiplyer = 0.5;
     let mut transform = Transform::default();
@@ -31,11 +32,13 @@ pub fn initialize_star(
         sprite_sheet: sprite_sheet_handle,
         sprite_number: 0, // default ship is 0
     };
+
     let mut bundle = world
         .create_entity()
         .with(transform)
         .with(velocity)
         .with(acceleration)
+        .with(SimpleAnimation::new(number_of_sprites, 5))
         .with(mass_comp)
         .with(force)
         .with(planet)

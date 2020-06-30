@@ -13,13 +13,13 @@ impl Component for SimpleAnimation {
 }
 
 impl SimpleAnimation {
-    pub fn new(max_index: usize, fps: f32) -> Self {
+    pub fn new(number_of_sprites: usize, fps: usize) -> Self {
         SimpleAnimation {
             current_index: 0,
             min_index: 0,
-            max_index: max_index,
-            time_pr_index: 1.0 / fps,
-            time_left: 1.0 / fps,
+            max_index: number_of_sprites - 1,
+            time_pr_index: 1.0 / (fps as f32),
+            time_left: 1.0 / (fps as f32),
         }
     }
 }
