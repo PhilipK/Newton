@@ -5,6 +5,7 @@ use amethyst::derive::SystemDesc;
 use amethyst::ecs::{
     Entities, Join, Read, ReadExpect, ReadStorage, System, SystemData, Write, WriteStorage,
 };
+use amethyst::renderer::SpriteRender;
 use amethyst::ui::UiText;
 use rand::Rng;
 
@@ -21,6 +22,7 @@ impl<'s> System<'s> for ScoreSystem {
         Write<'s, ScoreBoard>,
         WriteStorage<'s, UiText>,
         ReadExpect<'s, ScoreText>,
+        WriteStorage<'s, SpriteRender>,
     );
 
     fn run(
@@ -34,6 +36,7 @@ impl<'s> System<'s> for ScoreSystem {
             mut score_board,
             mut ui_texts,
             score_text,
+            mut sprites,
         ): Self::SystemData,
     ) {
         let delta_seconds = time.delta_seconds();
@@ -41,9 +44,12 @@ impl<'s> System<'s> for ScoreSystem {
         for (_player, player_entity) in (&players, &entities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
                 let player_position = player_transform.clone();
-                for (score_area, score_entity) in (&mut score_areas, &entities).join() {
+                for (score_area, score_entity, sprite) in
+                    (&mut score_areas, &entities, &mut sprites).join()
+                {
                     if let Some(score_area_transform) = transforms.get_mut(score_entity) {
                         if is_in_box(&player_position, score_area_transform, 64.0, 128.0) {
+                            sprite.sprite_number = 1;
                             score_area.time_left -= delta_seconds;
                             if score_area.time_left <= 0.0 {
                                 score_area.time_left = 3.0;
@@ -56,6 +62,8 @@ impl<'s> System<'s> for ScoreSystem {
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
                             }
+                        } else {
+                            sprite.sprite_number = 0;
                         }
                     }
                 }
