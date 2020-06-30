@@ -8,10 +8,7 @@ use crate::entities::score_board;
 use crate::entities::star;
 use crate::playercamera;
 use crate::resources::initialise_sprite_resource;
-use amethyst::core::math::Matrix;
-use amethyst::core::math::angle;
 use amethyst::core::math::Vector2;
-use amethyst::core::math::Vector3;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
 
@@ -200,11 +197,11 @@ pub fn spawn_score_arrow(
 
     let (x, y) = (target_x - cur_x, target_y - cur_y);
     let mag = ((x * x) + (y * y)).sqrt();
-    let speed = 100.0;
+    let speed = 500.0;
     let velocity = Velocity::new(x / mag * speed, y / mag * speed);
     let vel_vec = velocity.velocity;
     let forward = Vector2::new(0.0, 1.0);
-    let angle = angle(&vel_vec, &forward);
+    let angle = vel_vec.angle(&forward);
     arrow_transform.rotate_2d(angle);
 
     //Sprite renderer
