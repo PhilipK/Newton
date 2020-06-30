@@ -1,4 +1,4 @@
 (
   title: "newton",
-  dimensions: Some((1000, 1000)),
+  dimensions: Some((1920, 1080)),
 )

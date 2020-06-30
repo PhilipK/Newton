@@ -1,8 +1,8 @@
 use crate::components::ZoomCamera;
 use amethyst::{core::transform::Transform, prelude::*, renderer::Camera};
 
-pub const CAMERA_HEIGHT: f32 = 1000.0;
-pub const CAMERA_WIDTH: f32 = 1000.0;
+pub const CAMERA_HEIGHT: f32 = 1080.0;
+pub const CAMERA_WIDTH: f32 = 1920.0;
 
 pub fn initialize_camera(world: &mut World) {
     let mut transform = Transform::default();
@@ -14,9 +14,7 @@ pub fn initialize_camera(world: &mut World) {
             CAMERA_WIDTH * zoom_out_level,
             CAMERA_HEIGHT * zoom_out_level,
         ))
-        .with(ZoomCamera {
-            zoom_level: 1.0,
-        })
+        .with(ZoomCamera { zoom_level: 1.0 })
         .with(transform)
         .build();
 }
