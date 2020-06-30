@@ -41,6 +41,8 @@ impl<'s> System<'s> for ScoreSystem {
     ) {
         let delta_seconds = time.delta_seconds();
         let mut rng = rand::thread_rng();
+        let time_limit = 3.0;
+        let sprite_steps = 4;
         for (_player, player_entity) in (&players, &entities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
                 let player_position = player_transform.clone();
@@ -48,11 +50,11 @@ impl<'s> System<'s> for ScoreSystem {
                     (&mut score_areas, &entities, &mut sprites).join()
                 {
                     if let Some(score_area_transform) = transforms.get_mut(score_entity) {
-                        if is_in_box(&player_position, score_area_transform, 64.0, 128.0) {
-                            sprite.sprite_number = 1;
+                        let is_in = is_in_box(&player_position, score_area_transform, 64.0, 128.0);
+                        if is_in {
                             score_area.time_left -= delta_seconds;
                             if score_area.time_left <= 0.0 {
-                                score_area.time_left = 3.0;
+                                score_area.time_left = time_limit;
                                 score_area_transform.set_translation_xyz(
                                     rng.gen::<f32>() * 2000.0 - 1000.0,
                                     rng.gen::<f32>() * 2000.0 - 1000.0,
@@ -62,8 +64,16 @@ impl<'s> System<'s> for ScoreSystem {
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
                             }
-                        } else {
-                            sprite.sprite_number = 0;
+                        }
+                        if score_area.time_left > 0.0 {
+                            let sprite_offset = match is_in {
+                                true => sprite_steps,
+                                false => 0,
+                            };
+
+                            let progress = score_area.time_left / time_limit;
+                            let sprite_step = (1.0 - progress) * (sprite_steps as f32);
+                            sprite.sprite_number = (sprite_step as usize) + sprite_offset;
                         }
                     }
                 }
