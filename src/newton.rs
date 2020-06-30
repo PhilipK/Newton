@@ -84,6 +84,7 @@ impl SimpleState for Newton {
                 0.0,
                 0.0,
                 self.meteor_sprite_sheet_handle.clone().unwrap(),
+                4,
                 1,
             );
         }
@@ -98,6 +99,7 @@ impl SimpleState for Newton {
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
             4,
+            5,
         );
 
         star::initialize_star(
@@ -110,6 +112,7 @@ impl SimpleState for Newton {
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
             4,
+            5,
         );
         star::initialize_star(
             world,
@@ -121,6 +124,7 @@ impl SimpleState for Newton {
             -80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
             1,
+            1,
         );
         star::initialize_star(
             world,
@@ -131,6 +135,7 @@ impl SimpleState for Newton {
             -100.0,
             80.0,
             self.earth_sprite_sheet_handle.clone().unwrap(),
+            1,
             1,
         );
         score_area::initialize_score_area(

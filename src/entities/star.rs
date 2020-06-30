@@ -16,6 +16,7 @@ pub fn initialize_star(
     velocityy: f32,
     sprite_sheet_handle: Handle<SpriteSheet>,
     number_of_sprites: usize,
+    fps: usize,
 ) {
     let radius_multiplyer = 0.5;
     let mut transform = Transform::default();
@@ -38,7 +39,7 @@ pub fn initialize_star(
         .with(transform)
         .with(velocity)
         .with(acceleration)
-        .with(SimpleAnimation::new(number_of_sprites, 5))
+        .with(SimpleAnimation::new(number_of_sprites, fps))
         .with(mass_comp)
         .with(force)
         .with(planet)
