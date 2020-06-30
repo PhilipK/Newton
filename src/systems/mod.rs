@@ -7,6 +7,7 @@ pub use self::player_controller::PlayerControlllerSystem;
 pub use self::score_system::ScoreSystem;
 pub use self::velocity_to_transform::VelocityToTransformSystem;
 pub use self::player_animation_system::PlayerAnimationSystem;
+pub use self::score_arrow_system::ScoreArrowSystem;
 
 mod acceleration_to_velocity;
 mod player_animation_system;
@@ -17,3 +18,4 @@ mod player_collision_system;
 mod player_controller;
 mod score_system;
 mod velocity_to_transform;
+mod score_arrow_system;

@@ -1,15 +1,18 @@
 use crate::components::Player;
+use crate::components::ScoreArrow;
+use crate::components::Velocity;
 use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
-
 use crate::entities::star;
 use crate::playercamera;
+use crate::resources::initialise_sprite_resource;
 use amethyst::core::transform::Transform;
+use amethyst::ecs::world::LazyBuilder;
 
 use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
-use amethyst::ecs::{Join, ReadStorage};
+use amethyst::ecs::{Entity, Join, ReadStorage};
 
 use amethyst::prelude::*;
 
@@ -27,6 +30,7 @@ pub struct Newton {
     meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     star_field_sheet_handle: Option<Handle<SpriteSheet>>,
+    score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl Newton {
@@ -38,8 +42,14 @@ impl Newton {
             meteor_sprite_sheet_handle: Option::None,
             score_area_sprite_sheet_handle: Option::None,
             star_field_sheet_handle: Option::None,
+            score_arrow_sheet_handle: Option::None,
         }
     }
+}
+
+#[derive(Default)]
+pub struct SheetsHolder {
+    score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl SimpleState for Newton {
@@ -59,7 +69,10 @@ impl SimpleState for Newton {
             .replace(load_sprite_sheet(world, "score_area"));
         self.star_field_sheet_handle
             .replace(load_sprite_sheet(world, "star_field_big"));
+        self.score_arrow_sheet_handle
+            .replace(load_sprite_sheet(world, "next_arrow"));
 
+        initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
         let meteor_number = 10;
@@ -169,4 +182,36 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
             .with(sprite_render)
             .build();
     }
+}
+
+pub fn spawn_score_arrow(
+    builder: LazyBuilder,
+    current_pos: &Transform,
+    target_pos: &Transform,
+    sprite_sheet_handle: Handle<SpriteSheet>,
+) -> Entity {
+    //create score arrow
+    let mut arrow_transform = Transform::default();
+    let cur_x = current_pos.translation().x;
+    let cur_y = current_pos.translation().y;
+    arrow_transform.set_translation_xyz(cur_x, cur_y, 0.0);
+    let target_x = target_pos.translation().x;
+    let target_y = target_pos.translation().y;
+
+    let (x, y) = (target_x - cur_x, target_y - cur_y);
+    let mag = ((x * x) + (y * y)).sqrt();
+    let speed = 500.0;
+
+    //Sprite renderer
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet_handle,
+        sprite_number: 3, // default ship is 0
+    };
+
+    return builder
+        .with(arrow_transform)
+        .with(ScoreArrow {})
+        .with(sprite_render)
+        .with(Velocity::new(x / mag * speed, y / mag * speed))
+        .build();
 }

@@ -16,6 +16,7 @@ mod playercamera;
 
 mod components;
 mod entities;
+mod resources;
 mod systems;
 
 mod utils;
@@ -55,6 +56,7 @@ fn main() -> amethyst::Result<()> {
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(systems::PlayerAnimationSystem, "player_animation", &[])
         .with(systems::GravitySystem, "gravity", &[])
+        .with(systems::ScoreArrowSystem, "score_arrow_system", &[])
         .with(systems::ScoreSystem, "score_system", &[])
         .with(
             systems::ForceToAcceletationSystem,
