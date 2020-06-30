@@ -2,7 +2,6 @@ use crate::components::Player;
 use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
-use crate::entities::score_board::ScoreBoard;
 
 use crate::entities::star;
 use crate::playercamera;

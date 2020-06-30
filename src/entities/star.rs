@@ -1,9 +1,9 @@
 use crate::components::{Acceleration, Force, Gravity, Mass, Planet, Velocity};
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
+    assets::{ Handle},
     core::transform::Transform,
     prelude::{Builder, World, WorldExt},
-    renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    renderer::{ SpriteRender, SpriteSheet},
 };
 
 pub fn initialize_star(

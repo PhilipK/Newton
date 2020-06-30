@@ -1,10 +1,7 @@
-use amethyst::core::timing::Time;
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
-    core::transform::Transform,
-    ecs::prelude::{Component, DenseVecStorage, Entity},
+    assets::Loader,
+    ecs::prelude::Entity,
     prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 
