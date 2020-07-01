@@ -2,7 +2,7 @@ use crate::components::{Player, ScoreArea};
 use crate::entities::score_board::{ScoreBoard, ScoreText};
 use crate::newton::spawn_score_arrow;
 use crate::resources::SpriteResource;
-use crate::resources::{play_score_sound, Sounds};
+use crate::resources::{play_score_sound, play_score_tick_sound, Sounds};
 use amethyst::assets::AssetStorage;
 use amethyst::audio::{output::Output, Source};
 use amethyst::core::{timing::Time, Transform};
@@ -73,6 +73,7 @@ impl<'s> System<'s> for ScoreSystem {
                     if let Some(score_area_transform) = transforms.get(score_entity) {
                         let is_in = is_in_box(&player_position, score_area_transform, 64.0, 128.0);
                         if is_in {
+                            let time_before = score_area.time_left;
                             score_area.time_left -= delta_seconds;
                             if score_area.time_left <= 0.0 {
                                 //we scored
@@ -87,6 +88,15 @@ impl<'s> System<'s> for ScoreSystem {
                                 score_board.score += 1;
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
+                            } else {
+                                if time_before.ceil() > score_area.time_left.ceil() {
+                                    //we scored
+                                    play_score_tick_sound(
+                                        &*sounds,
+                                        &storage,
+                                        audio_output.as_ref().map(|o| o.deref()),
+                                    );
+                                }
                             }
                         }
                         if score_area.time_left > 0.0 {
