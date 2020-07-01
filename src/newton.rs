@@ -8,7 +8,9 @@ use crate::entities::score_area;
 use crate::entities::score_board;
 use crate::entities::star;
 use crate::playercamera;
+use crate::resources::initialize_audio;
 use crate::resources::initialise_sprite_resource;
+
 use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
@@ -71,6 +73,7 @@ impl SimpleState for Newton {
             .replace(load_sprite_sheet(world, "next_arrow"));
 
         initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
+        initialize_audio(world);
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 
         let meteor_number = 10;

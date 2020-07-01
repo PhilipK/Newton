@@ -2,6 +2,9 @@ use crate::components::{Player, ScoreArea};
 use crate::entities::score_board::{ScoreBoard, ScoreText};
 use crate::newton::spawn_score_arrow;
 use crate::resources::SpriteResource;
+use crate::resources::{play_score_sound, Sounds};
+use amethyst::assets::AssetStorage;
+use amethyst::audio::{output::Output, Source};
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::prelude::LazyUpdate;
@@ -10,6 +13,8 @@ use amethyst::ecs::{
 };
 use amethyst::renderer::SpriteRender;
 use amethyst::ui::UiText;
+use std::ops::Deref;
+
 use rand::Rng;
 
 #[derive(SystemDesc)]
@@ -28,6 +33,9 @@ impl<'s> System<'s> for ScoreSystem {
         WriteStorage<'s, SpriteRender>,
         Read<'s, LazyUpdate>,
         ReadExpect<'s, SpriteResource>,
+        ReadExpect<'s, Sounds>,
+        Option<Read<'s, Output>>,
+        Read<'s, AssetStorage<Source>>,
     );
 
     fn run(
@@ -44,6 +52,9 @@ impl<'s> System<'s> for ScoreSystem {
             mut sprites,
             lazy,
             sprite_resource,
+            sounds,
+            audio_output,
+            storage,
         ): Self::SystemData,
     ) {
         let delta_seconds = time.delta_seconds();
@@ -65,6 +76,12 @@ impl<'s> System<'s> for ScoreSystem {
                             score_area.time_left -= delta_seconds;
                             if score_area.time_left <= 0.0 {
                                 //we scored
+                                play_score_sound(
+                                    &*sounds,
+                                    &storage,
+                                    audio_output.as_ref().map(|o| o.deref()),
+                                );
+
                                 score_area.time_left = time_limit;
                                 scored = true;
                                 score_board.score += 1;

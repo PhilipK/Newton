@@ -13,6 +13,7 @@ use amethyst::{
 
 mod newton;
 mod playercamera;
+use amethyst::audio::AudioBundle;
 
 mod components;
 mod entities;
@@ -52,6 +53,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
+        .with_bundle(AudioBundle::default())?
         .with(systems::PlayerCollisionSystem, "player_collision", &[])
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(systems::PlayerAnimationSystem, "player_animation", &[])
