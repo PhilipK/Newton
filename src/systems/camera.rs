@@ -3,6 +3,7 @@ use crate::components::ScoreArea;
 use crate::components::ZoomCamera;
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use crate::utils::distance_squared_vec;
+use amethyst::core::timing::Time;
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::{
     core::Transform,
@@ -23,11 +24,21 @@ impl<'s> System<'s> for CameraSystem {
         Read<'s, InputHandler<StringBindings>>,
         Entities<'s>,
         ReadStorage<'s, ScoreArea>,
+        Read<'s, Time>,
     );
 
     fn run(
         &mut self,
-        (mut cameras, mut zoom_cameras, mut transforms, players, input, entities,score_areas): Self::SystemData,
+        (
+            mut cameras,
+            mut zoom_cameras,
+            mut transforms,
+            players,
+            input,
+            entities,
+            score_areas,
+            time,
+        ): Self::SystemData,
     ) {
         let zoom_speed = 0.5;
         let max_zoom_level = 10.0;
@@ -54,38 +65,39 @@ impl<'s> System<'s> for CameraSystem {
                                 camera.set_projection(scaled_projection);
                             }
 
+                            let mut tx = player_position.x;
+                            let mut ty = player_position.y;
+
                             let distance =
                                 distance_squared_vec(&player_position, &score_transform_cl).sqrt();
-                            let max_distance = 750.0;
-                            let min_distance = 400.0;
-                            if distance > max_distance {
-                                camera_transform.set_translation_xyz(
-                                    player_position.x,
-                                    player_position.y,
-                                    1.0,
-                                );
-                            } else {
+                            let max_distance = 450.0;
+                            let min_distance = 250.0;
+                            if distance < max_distance {
                                 let mut percent = 0.0;
                                 if distance > min_distance {
                                     percent =
                                         (distance - min_distance) / (max_distance - min_distance);
                                 }
-                                let (tx, ty) = (
-                                    ((1.0 - percent) * score_transform_cl.x)
-                                        + ((percent) * player_position.x),
-                                    ((1.0 - percent) * score_transform_cl.y)
-                                        + ((percent) * player_position.y),
-                                );
-                                let cur_camera_pos = camera_transform.translation();
-
-                                camera_transform.set_translation_xyz(tx, ty, 1.0);
+                                tx = lerp(score_transform_cl.x, player_position.x, percent);
+                                ty = lerp(score_transform_cl.y, player_position.y, percent);
                             }
+                            let delta_seconds = time.delta_seconds() * 6.0;
+                            let cur_camera_pos = camera_transform.translation();
+                            camera_transform.set_translation_xyz(
+                                lerp(cur_camera_pos.x, tx, delta_seconds),
+                                lerp(cur_camera_pos.y, ty, delta_seconds),
+                                1.0,
+                            );
                         }
                     }
                 }
             }
         }
     }
+}
+
+fn lerp(a: f32, b: f32, percent: f32) -> f32 {
+    (1.0 - percent) * a + percent * b
 }
 
 fn clamp(input: f32, min: f32, max: f32) -> f32 {
