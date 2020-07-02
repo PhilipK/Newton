@@ -1,12 +1,10 @@
-// use crate::resources::{play_thrust_sound, Sounds};
-use crate::resources::{Sounds};
+use crate::resources::{pause_thrust_sound, play_thrust_sound, Sounds};
 use amethyst::assets::AssetStorage;
-use amethyst::audio::{output::Output, Source};
+use amethyst::audio::Source;
 use amethyst::core::math::Vector3;
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
 use amethyst::derive::SystemDesc;
-use std::ops::Deref;
 
 use amethyst::ecs::{Join, Read, ReadExpect, ReadStorage, System, SystemData, WriteStorage};
 use amethyst::input::{InputHandler, StringBindings};
@@ -25,15 +23,12 @@ impl<'s> System<'s> for PlayerControlllerSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         ReadExpect<'s, Sounds>,
-        Option<Read<'s, Output>>,
         Read<'s, AssetStorage<Source>>,
     );
 
     fn run(
         &mut self,
-        (mut forces, players, mut tarnsforms, input, time,      sounds,
-            audio_output,
-            storage,): Self::SystemData,
+        (mut forces, players, mut tarnsforms, input, time, sounds, storage): Self::SystemData,
     ) {
         for (force, player, transform) in (&mut forces, &players, &mut tarnsforms).join() {
             let delta_time = time.delta_seconds();
@@ -50,7 +45,9 @@ impl<'s> System<'s> for PlayerControlllerSystem {
                     let direction = transform.isometry().inverse().rotation * -Vector3::y();
                     let add_force = direction * throttle;
                     force.add_force(add_force.x, add_force.y * -1.0);
-                    // play_thrust_sound(&*sounds, &storage, audio_output.as_ref().map(|o| o.deref()));
+                    play_thrust_sound(&sounds, &storage);
+                } else {
+                    pause_thrust_sound(&*sounds);
                 }
             }
         }
