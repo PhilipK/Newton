@@ -1,3 +1,5 @@
+use crate::resources::Music;
+use amethyst::audio::DjSystemDesc;
 use amethyst::{
     core::transform::TransformBundle,
     input::{InputBundle, StringBindings},
@@ -54,6 +56,11 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
         .with_bundle(AudioBundle::default())?
+        .with_system_desc(
+            DjSystemDesc::new(|music: &mut Music| music.music.next()),
+            "dj_system",
+            &[],
+        )
         .with(systems::PlayerCollisionSystem, "player_collision", &[])
         .with(systems::PlayerControlllerSystem, "player_controller", &[])
         .with(systems::PlayerAnimationSystem, "player_animation", &[])
