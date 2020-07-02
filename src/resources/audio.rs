@@ -26,7 +26,8 @@ pub fn initialize_audio(world: &mut World) {
         let loader = world.read_resource::<Loader>();
         let thrust_sfx = load_audio_tracks(&loader, world, THRUST_SOUND);
         let output_un = &output;
-        let sink = AudioSink::new(output_un);
+        let mut sink = AudioSink::new(output_un);
+        sink.set_volume(0.2);
         let sound = Sounds {
             score_sfx: load_audio_tracks(&loader, world, SCORE_SOUND),
             score_tick_sfx: load_audio_tracks(&loader, world, SCORE_TICK_SOUND),
