@@ -217,7 +217,7 @@ impl<'a, 'b> SimpleState for TitleScreen {
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let input: Read<InputHandler<StringBindings>> = data.world.system_data();
         if let Some(value) = input.axis_value("throttle") {
-            if (value > 0.0) {
+            if value > 0.0 {
                 return Trans::Replace(Box::new(Newton::default()));
             }
         }
