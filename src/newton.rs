@@ -19,6 +19,7 @@ use crate::resources::initialize_audio;
 use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
+use std::f64::consts::PI;
 
 use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
@@ -42,9 +43,9 @@ pub struct Newton<'a, 'b> {
     earth_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    star_field_sheet_handle: Option<Handle<SpriteSheet>>,
     score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
     dispatcher: Option<Dispatcher<'a, 'b>>,
+    star_field_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl Newton<'_, '_> {
@@ -59,10 +60,10 @@ impl Newton<'_, '_> {
             .replace(load_sprite_sheet(world, "meteor"));
         self.score_area_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "score_area"));
-        self.star_field_sheet_handle
-            .replace(load_sprite_sheet(world, "star_field_big"));
         self.score_arrow_sheet_handle
             .replace(load_sprite_sheet(world, "next_arrow"));
+        self.star_field_sheet_handle
+            .replace(load_sprite_sheet(world, "star_field_big"));
     }
 
     fn load_planets(&mut self, world: &mut World) {
@@ -197,8 +198,8 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
             world,
             self.score_area_sprite_sheet_handle.clone().unwrap(),
         );
-        initialize_star_field(world, self.star_field_sheet_handle.clone().unwrap());
         playercamera::initialize_camera(world);
+        initialize_star_field(world, self.star_field_sheet_handle.clone().unwrap());
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -239,7 +240,7 @@ impl<'a, 'b> SimpleState for TitleScreen {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         initialize_audio(world);
-        title_text::itnitialize_title_text(world)
+        title_text::itnitialize_title_text(world);
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
@@ -250,6 +251,34 @@ impl<'a, 'b> SimpleState for TitleScreen {
             }
         }
 
+        Trans::None
+    }
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let system_data: Entities = data.world.system_data();
+        for entity in (&system_data).join() {
+            let _unused = system_data.delete(entity);
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct HighScoreScreen {
+    pub score: i32,
+}
+
+impl<'a, 'b> SimpleState for HighScoreScreen {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        high_score_text::itnitialize_highscore_text(world, self.score);
+    }
+
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
+        if let Some(value) = input.axis_value("throttle") {
+            if value < 0.0 {
+                return Trans::Replace(Box::new(Newton::default()));
+            }
+        }
         Trans::None
     }
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -285,34 +314,6 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
     }
 }
 
-#[derive(Default)]
-pub struct HighScoreScreen {
-    pub score: i32,
-}
-
-impl<'a, 'b> SimpleState for HighScoreScreen {
-    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let world = data.world;
-        high_score_text::itnitialize_highscore_text(world, self.score);
-    }
-
-    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
-        if let Some(value) = input.axis_value("throttle") {
-            if value < 0.0 {
-                return Trans::Replace(Box::new(Newton::default()));
-            }
-        }
-        Trans::None
-    }
-    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();
-        for entity in (&system_data).join() {
-            let _unused = system_data.delete(entity);
-        }
-    }
-}
-
 pub fn spawn_score_arrow(
     builder: LazyBuilder,
     current_pos: &Transform,
@@ -331,10 +332,15 @@ pub fn spawn_score_arrow(
     let mag = ((x * x) + (y * y)).sqrt();
     let speed = 250.0;
     let velocity = Velocity::new(x / mag * speed, y / mag * speed);
-    let vel_vec = velocity.velocity;
-    let forward = Vector2::new(0.0, 1.0);
-    let angle = vel_vec.angle(&forward);
-    arrow_transform.rotate_2d(angle);
+    let vel_vec: Vector2<f32> = velocity.velocity;
+    let up = Vector2::new(0.0, 1.0);
+    let mut angle = up.angle(&vel_vec);
+    println!("a1 {}", up.angle(&vel_vec));
+    if vel_vec.x > 0.0 {
+        angle = 2.0 * PI as f32 - angle;
+    }
+    println!("a2 {}", vel_vec.angle(&up));
+    arrow_transform.set_rotation_2d(angle);
 
     //Sprite renderer
     let sprite_render = SpriteRender {

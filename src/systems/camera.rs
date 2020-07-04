@@ -46,7 +46,7 @@ impl<'s> System<'s> for CameraSystem {
         ): Self::SystemData,
     ) {
         let zoom_speed = 0.5;
-        let max_zoom_level = 10.0;
+        let max_zoom_level = 3.0;
         let min_zoom_level = 0.5;
         let lerp_mag = 2.;
 
