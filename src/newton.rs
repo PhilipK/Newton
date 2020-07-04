@@ -52,11 +52,8 @@ impl Newton {
     }
 }
 
-impl SimpleState for Newton {
-    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let world = data.world;
-        score_board::initialise_scoreboard(world);
-
+impl Newton {
+    fn load_sprite_sheets(&mut self, world: &mut World) {
         self.player_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "player_spritesheet"));
         self.star_sprite_sheet_handle
@@ -71,11 +68,9 @@ impl SimpleState for Newton {
             .replace(load_sprite_sheet(world, "star_field_big"));
         self.score_arrow_sheet_handle
             .replace(load_sprite_sheet(world, "next_arrow"));
+    }
 
-        initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
-        initialize_audio(world);
-        player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
-
+    fn load_planets(&mut self, world: &mut World) {
         let meteor_number = 10;
         for i in 0..meteor_number {
             star::initialize_star(
@@ -141,13 +136,23 @@ impl SimpleState for Newton {
             7,
             5,
         );
+    }
+}
+
+impl SimpleState for Newton {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        score_board::initialise_scoreboard(world);
+        self.load_sprite_sheets(world);
+        initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
+        initialize_audio(world);
+        player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
+        self.load_planets(world);
         score_area::initialize_score_area(
             world,
             self.score_area_sprite_sheet_handle.clone().unwrap(),
         );
-
         initialize_star_field(world, self.star_field_sheet_handle.clone().unwrap());
-
         playercamera::initialize_camera(world);
     }
 
@@ -173,7 +178,6 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
     let width = 20;
     let height = 20;
     let sprite_size = 512.0;
-    // let offset = -1.0 * (width as f32) / 2.0 * (height as f32) / 2.0 * sprite_size;
     let offset = (width as f32) * -0.5 * sprite_size;
     for i in 0..(width * height) {
         let mut transform = Transform::default();
