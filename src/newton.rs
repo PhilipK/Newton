@@ -1,6 +1,7 @@
 use crate::components::Player;
 use crate::components::ScoreArrow;
 use crate::components::SimpleAnimation;
+use amethyst_core::ArcThreadPool;
 
 use crate::components::Velocity;
 use crate::entities::player;
@@ -19,6 +20,8 @@ use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
 use amethyst::ecs::{Entity, Join, ReadStorage};
 
+use crate::systems::*;
+use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
 use amethyst::prelude::*;
 
 use amethyst::{
@@ -28,7 +31,7 @@ use amethyst::{
 };
 
 #[derive(Default)]
-pub struct Newton {
+pub struct Newton<'a, 'b> {
     player_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     star_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     earth_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
@@ -36,9 +39,10 @@ pub struct Newton {
     score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     star_field_sheet_handle: Option<Handle<SpriteSheet>>,
     score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
+    dispatcher: Option<Dispatcher<'a, 'b>>,
 }
 
-impl Newton {
+impl Newton<'_, '_> {
     fn new() -> Self {
         Newton {
             player_sprite_sheet_handle: Option::None,
@@ -48,11 +52,12 @@ impl Newton {
             score_area_sprite_sheet_handle: Option::None,
             star_field_sheet_handle: Option::None,
             score_arrow_sheet_handle: Option::None,
+            dispatcher: Option::None,
         }
     }
 }
 
-impl Newton {
+impl Newton<'_, '_> {
     fn load_sprite_sheets(&mut self, world: &mut World) {
         self.player_sprite_sheet_handle
             .replace(load_sprite_sheet(world, "player_spritesheet"));
@@ -139,9 +144,47 @@ impl Newton {
     }
 }
 
-impl SimpleState for Newton {
+impl<'a, 'b> SimpleState for Newton<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+
+        // Create the `DispatcherBuilder` and register some `System`s that should only run for this `State`.
+        let mut dispatcher_builder = DispatcherBuilder::new();
+        dispatcher_builder.add(PlayerCollisionSystem, "player_collision", &[]);
+        dispatcher_builder.add(PlayerControlllerSystem, "player_controller", &[]);
+        dispatcher_builder.add(PlayerAnimationSystem, "player_animation", &[]);
+        dispatcher_builder.add(SimpleAnimationSystem, "simple_animation", &[]);
+        dispatcher_builder.add(GravitySystem, "gravity", &[]);
+        dispatcher_builder.add(ScoreArrowSystem, "score_arrow_system", &[]);
+        dispatcher_builder.add(ScoreSystem, "score_system", &[]);
+        dispatcher_builder.add(
+            ForceToAcceletationSystem,
+            "force_to_acceleration",
+            &["player_controller", "gravity"],
+        );
+        dispatcher_builder.add(
+            AccelerationToVelocitySystem,
+            "acceleration_to_velocity_system",
+            &["force_to_acceleration"],
+        );
+        dispatcher_builder.add(
+            VelocityToTransformSystem,
+            "velocity_to_transform_system",
+            &["acceleration_to_velocity_system"],
+        );
+        dispatcher_builder.add(
+            CameraSystem,
+            "camera_system",
+            &["velocity_to_transform_system"],
+        );
+
+        // Build and setup the `Dispatcher`.
+        let mut dispatcher = dispatcher_builder
+            .with_pool((*world.read_resource::<ArcThreadPool>()).clone())
+            .build();
+        dispatcher.setup(world);
+        self.dispatcher = Some(dispatcher);
+
         score_board::initialise_scoreboard(world);
         self.load_sprite_sheets(world);
         initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
@@ -164,6 +207,9 @@ impl SimpleState for Newton {
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        if let Some(dispatcher) = self.dispatcher.as_mut() {
+            dispatcher.dispatch(&data.world);
+        }
         let system_data: ReadStorage<Player> = data.world.system_data();
         for player in (&system_data).join() {
             if player.is_dead {
@@ -174,6 +220,25 @@ impl SimpleState for Newton {
         Trans::None
     }
 }
+
+#[derive(Default)]
+pub struct TitleScreen<'a, 'b> {
+    /// The `State` specific `Dispatcher`, containing `System`s only relevant for this `State`.
+    dispatcher: Option<Dispatcher<'a, 'b>>,
+}
+
+impl<'a, 'b> SimpleState for TitleScreen<'a, 'b> {
+    fn on_start(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
+        let world = &mut data.world;
+    }
+
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {}
+
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        Trans::None
+    }
+}
+
 fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
     let width = 20;
     let height = 20;

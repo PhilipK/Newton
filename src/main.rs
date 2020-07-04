@@ -60,33 +60,6 @@ fn main() -> amethyst::Result<()> {
             DjSystemDesc::new(|music: &mut Music| music.music.next()),
             "dj_system",
             &[],
-        )
-        .with(systems::PlayerCollisionSystem, "player_collision", &[])
-        .with(systems::PlayerControlllerSystem, "player_controller", &[])
-        .with(systems::PlayerAnimationSystem, "player_animation", &[])
-        .with(systems::SimpleAnimationSystem, "simple_animation", &[])
-        .with(systems::GravitySystem, "gravity", &[])
-        .with(systems::ScoreArrowSystem, "score_arrow_system", &[])
-        .with(systems::ScoreSystem, "score_system", &[])
-        .with(
-            systems::ForceToAcceletationSystem,
-            "force_to_acceleration",
-            &["player_controller", "gravity"],
-        )
-        .with(
-            systems::AccelerationToVelocitySystem,
-            "acceleration_to_velocity_system",
-            &["force_to_acceleration"],
-        )
-        .with(
-            systems::VelocityToTransformSystem,
-            "velocity_to_transform_system",
-            &["acceleration_to_velocity_system"],
-        )
-        .with(
-            systems::CameraSystem,
-            "camera_system",
-            &["velocity_to_transform_system"],
         );
 
     let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
