@@ -1,6 +1,9 @@
 use crate::components::Player;
 use crate::components::ScoreArrow;
 use crate::components::SimpleAnimation;
+use crate::entities::high_score_text;
+use crate::entities::score_board::ScoreBoard;
+
 use amethyst_core::ArcThreadPool;
 
 use crate::components::Velocity;
@@ -19,7 +22,7 @@ use amethyst::ecs::world::LazyBuilder;
 
 use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
-use amethyst::ecs::{Entity, Join, Read, ReadStorage};
+use amethyst::ecs::{Entity, Join, Read, ReadStorage, Write};
 
 use crate::systems::*;
 use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
@@ -92,7 +95,7 @@ impl Newton<'_, '_> {
             5,
         );
 
-          star::initialize_star(
+        star::initialize_star(
             world,
             1000000.0,
             64.0,
@@ -206,13 +209,22 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        let world = &data.world;
         if let Some(dispatcher) = self.dispatcher.as_mut() {
-            dispatcher.dispatch(&data.world);
+            dispatcher.dispatch(&world);
         }
-        let system_data: ReadStorage<Player> = data.world.system_data();
-        for player in (&system_data).join() {
+        let players: ReadStorage<Player> = world.system_data();
+        for player in (&players).join() {
             if player.is_dead {
-                return Trans::Replace(Box::new(Newton::default()));
+                let score = {
+                    let mut system_data: Write<ScoreBoard> = world.system_data();
+                    let res = system_data.score;
+                    system_data.score = 0;
+                    res
+                };
+
+                let high_score_state = HighScoreScreen { score };
+                return Trans::Replace(Box::new(high_score_state));
             }
         }
 
@@ -270,6 +282,34 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
             .with(transform)
             .with(sprite_render)
             .build();
+    }
+}
+
+#[derive(Default)]
+pub struct HighScoreScreen {
+    pub score: i32,
+}
+
+impl<'a, 'b> SimpleState for HighScoreScreen {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        high_score_text::itnitialize_highscore_text(world, self.score);
+    }
+
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
+        if let Some(value) = input.axis_value("throttle") {
+            if value < 0.0 {
+                return Trans::Replace(Box::new(Newton::default()));
+            }
+        }
+        Trans::None
+    }
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let system_data: Entities = data.world.system_data();
+        for entity in (&system_data).join() {
+            let _unused = system_data.delete(entity);
+        }
     }
 }
 
