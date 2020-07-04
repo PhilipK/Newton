@@ -10,17 +10,14 @@ use crate::entities::star;
 use crate::playercamera;
 use crate::resources::initialise_sprite_resource;
 use crate::resources::initialize_audio;
-use crate::resources::Sounds;
-use amethyst::audio::{output::Output, Source};
 
 use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
 
 use crate::utils::load_sprite_sheet;
-use amethyst::assets::AssetStorage;
 use amethyst::ecs::Entities;
-use amethyst::ecs::{Entity, Join, Read, ReadExpect, ReadStorage, WriteExpect};
+use amethyst::ecs::{Entity, Join, ReadStorage};
 
 use amethyst::prelude::*;
 
@@ -76,7 +73,6 @@ impl SimpleState for Newton {
             .replace(load_sprite_sheet(world, "next_arrow"));
 
         initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
-        
         initialize_audio(world);
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
 

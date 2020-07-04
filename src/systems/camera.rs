@@ -82,12 +82,15 @@ impl<'s> System<'s> for CameraSystem {
                                 ty = lerp(score_transform_cl.y, player_position.y, percent);
                             }
                             let delta_seconds = time.delta_seconds() * 6.0;
-                            let cur_camera_pos = camera_transform.translation();
-                            camera_transform.set_translation_xyz(
-                                lerp(cur_camera_pos.x, tx, delta_seconds),
-                                lerp(cur_camera_pos.y, ty, delta_seconds),
-                                1.0,
-                            );
+                            {
+                                let cur_camera_pos = camera_transform.translation();
+                                let (cx, cy) = (cur_camera_pos.x, cur_camera_pos.y);
+                                camera_transform.set_translation_xyz(
+                                    lerp(cx, tx, delta_seconds),
+                                    lerp(cy, ty, delta_seconds),
+                                    1.0,
+                                );
+                            }
                         }
                     }
                 }
