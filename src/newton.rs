@@ -18,10 +18,11 @@ use amethyst::ecs::world::LazyBuilder;
 
 use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
-use amethyst::ecs::{Entity, Join, ReadStorage};
+use amethyst::ecs::{Entity, Join, Read, ReadStorage};
 
 use crate::systems::*;
 use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
+use amethyst::input::{InputHandler, StringBindings};
 use amethyst::prelude::*;
 
 use amethyst::{
@@ -40,21 +41,6 @@ pub struct Newton<'a, 'b> {
     star_field_sheet_handle: Option<Handle<SpriteSheet>>,
     score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
     dispatcher: Option<Dispatcher<'a, 'b>>,
-}
-
-impl Newton<'_, '_> {
-    fn new() -> Self {
-        Newton {
-            player_sprite_sheet_handle: Option::None,
-            star_sprite_sheet_handle: Option::None,
-            earth_sprite_sheet_handle: Option::None,
-            meteor_sprite_sheet_handle: Option::None,
-            score_area_sprite_sheet_handle: Option::None,
-            star_field_sheet_handle: Option::None,
-            score_arrow_sheet_handle: Option::None,
-            dispatcher: Option::None,
-        }
-    }
 }
 
 impl Newton<'_, '_> {
@@ -188,7 +174,6 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
         score_board::initialise_scoreboard(world);
         self.load_sprite_sheets(world);
         initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
-        initialize_audio(world);
         player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
         self.load_planets(world);
         score_area::initialize_score_area(
@@ -213,7 +198,7 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
         let system_data: ReadStorage<Player> = data.world.system_data();
         for player in (&system_data).join() {
             if player.is_dead {
-                return Trans::Replace(Box::new(Newton::new()));
+                return Trans::Replace(Box::new(Newton::default()));
             }
         }
 
@@ -222,19 +207,21 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
 }
 
 #[derive(Default)]
-pub struct TitleScreen<'a, 'b> {
-    /// The `State` specific `Dispatcher`, containing `System`s only relevant for this `State`.
-    dispatcher: Option<Dispatcher<'a, 'b>>,
-}
+pub struct TitleScreen {}
 
-impl<'a, 'b> SimpleState for TitleScreen<'a, 'b> {
-    fn on_start(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
-        let world = &mut data.world;
+impl<'a, 'b> SimpleState for TitleScreen {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        initialize_audio(data.world);
     }
 
-    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {}
-
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
+        if let Some(value) = input.axis_value("throttle") {
+            if (value > 0.0) {
+                return Trans::Replace(Box::new(Newton::default()));
+            }
+        }
+
         Trans::None
     }
 }

@@ -62,7 +62,7 @@ fn main() -> amethyst::Result<()> {
             &[],
         );
 
-    let mut game = Application::new(assets_dir, newton::Newton::default(), game_data)?;
+    let mut game = Application::new(assets_dir, newton::TitleScreen::default(), game_data)?;
     game.run();
 
     Ok(())
