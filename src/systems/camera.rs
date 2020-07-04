@@ -1,10 +1,13 @@
 use crate::components::Player;
 use crate::components::ScoreArea;
+use crate::components::Velocity;
 use crate::components::ZoomCamera;
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use crate::utils::distance_squared_vec;
+use amethyst::core::math::Vector3;
 use amethyst::core::timing::Time;
 use amethyst::input::{InputHandler, StringBindings};
+
 use amethyst::{
     core::Transform,
     derive::SystemDesc,
@@ -21,6 +24,7 @@ impl<'s> System<'s> for CameraSystem {
         WriteStorage<'s, ZoomCamera>,
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Player>,
+        ReadStorage<'s, Velocity>,
         Read<'s, InputHandler<StringBindings>>,
         Entities<'s>,
         ReadStorage<'s, ScoreArea>,
@@ -34,6 +38,7 @@ impl<'s> System<'s> for CameraSystem {
             mut zoom_cameras,
             mut transforms,
             players,
+            velocities,
             input,
             entities,
             score_areas,
@@ -43,10 +48,18 @@ impl<'s> System<'s> for CameraSystem {
         let zoom_speed = 0.5;
         let max_zoom_level = 10.0;
         let min_zoom_level = 0.5;
+        let lerp_mag = 2.;
 
-        for (player_entity, _player) in (&entities, &players).join() {
+        for (player_entity, _player, player_velocity) in (&entities, &players, &velocities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
-                let player_position = player_transform.translation().clone();
+                let player_position = {
+                    let p_pos = player_transform.translation().clone();
+                    Vector3::new(
+                        p_pos.x + player_velocity.velocity.x,
+                        p_pos.y + player_velocity.velocity.y,
+                        0.,
+                    )
+                };
                 for (camera_entity, camera, zoom_camera) in
                     (&entities, &mut cameras, &mut zoom_cameras).join()
                 {
@@ -70,8 +83,8 @@ impl<'s> System<'s> for CameraSystem {
 
                             let distance =
                                 distance_squared_vec(&player_position, &score_transform_cl).sqrt();
-                            let max_distance = 450.0;
-                            let min_distance = 250.0;
+                            let max_distance = 800.0;
+                            let min_distance = 300.0;
                             if distance < max_distance {
                                 let mut percent = 0.0;
                                 if distance > min_distance {
@@ -81,7 +94,7 @@ impl<'s> System<'s> for CameraSystem {
                                 tx = lerp(score_transform_cl.x, player_position.x, percent);
                                 ty = lerp(score_transform_cl.y, player_position.y, percent);
                             }
-                            let delta_seconds = time.delta_seconds() * 6.0;
+                            let delta_seconds = time.delta_seconds() * lerp_mag;
                             {
                                 let cur_camera_pos = camera_transform.translation();
                                 let (cx, cy) = (cur_camera_pos.x, cur_camera_pos.y);
@@ -100,7 +113,8 @@ impl<'s> System<'s> for CameraSystem {
 }
 
 fn lerp(a: f32, b: f32, percent: f32) -> f32 {
-    (1.0 - percent) * a + percent * b
+    let cpr = clamp(percent, 0.0, 1.0);
+    (1.0 - cpr) * a + cpr * b
 }
 
 fn clamp(input: f32, min: f32, max: f32) -> f32 {
