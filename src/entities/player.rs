@@ -1,4 +1,5 @@
 use crate::components::{Acceleration, Force, Mass, Player, Velocity};
+use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use amethyst::{
     assets::Handle,
     core::transform::Transform,
@@ -9,8 +10,6 @@ use amethyst::{
 pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let player = Player {
         forward_thrust_power: 10000.0,
-        backwards_thrust_power: 3333.0,
-        sideways_thrust_power: 5000.0,
         turn_pr_second: 3.0,
         is_dead: false,
     };
@@ -20,7 +19,7 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
     let acceleration = Acceleration::new(0.0, 0.0);
     let mut transform = Transform::default();
     //Position the player
-    transform.set_translation_xyz(200.0, 500.0, 0.0);
+    transform.set_translation_xyz(CAMERA_WIDTH*0.5, CAMERA_HEIGHT*0.5, 0.0);
 
     //Sprite renderer
     let sprite_render = SpriteRender {

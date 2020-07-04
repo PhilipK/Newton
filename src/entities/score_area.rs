@@ -9,8 +9,7 @@ use amethyst::{
 pub fn initialize_score_area(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let score_area = ScoreArea::new(3.0);
     let mut transform = Transform::default();
-    //Position the player
-    transform.set_translation_xyz(100.0, 200.0, 0.0);
+    transform.set_translation_xyz(800.0, 1000.0, 0.0);
 
     //Sprite renderer
     let sprite_render = SpriteRender {

@@ -63,7 +63,7 @@ impl Newton<'_, '_> {
     }
 
     fn load_planets(&mut self, world: &mut World) {
-        let meteor_number = 10;
+        let meteor_number = 20;
         for i in 0..meteor_number {
             star::initialize_star(
                 world,
@@ -83,8 +83,21 @@ impl Newton<'_, '_> {
             world,
             1000000.0,
             64.0,
-            200.0,
-            200.0,
+            0.0,
+            0.0,
+            -100.0,
+            0.0,
+            self.star_sprite_sheet_handle.clone().unwrap(),
+            4,
+            5,
+        );
+
+          star::initialize_star(
+            world,
+            1000000.0,
+            64.0,
+            -200.0,
+            0.0,
             -100.0,
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
@@ -96,8 +109,8 @@ impl Newton<'_, '_> {
             world,
             1000000.0,
             62.0,
-            700.0,
-            700.0,
+            900.0,
+            900.0,
             100.0,
             0.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
