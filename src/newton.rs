@@ -8,6 +8,7 @@ use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
 use crate::entities::star;
+use crate::entities::title_text;
 use crate::playercamera;
 use crate::resources::initialise_sprite_resource;
 use crate::resources::initialize_audio;
@@ -211,7 +212,9 @@ pub struct TitleScreen {}
 
 impl<'a, 'b> SimpleState for TitleScreen {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        initialize_audio(data.world);
+        let world = data.world;
+        initialize_audio(world);
+        title_text::itnitialize_title_text(world)
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
@@ -223,6 +226,12 @@ impl<'a, 'b> SimpleState for TitleScreen {
         }
 
         Trans::None
+    }
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let system_data: Entities = data.world.system_data();
+        for entity in (&system_data).join() {
+            let _unused = system_data.delete(entity);
+        }
     }
 }
 
