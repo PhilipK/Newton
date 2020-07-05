@@ -260,10 +260,6 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
         }
     }
 
-    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        println!("Resuming Newton");
-    }
-
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let world = &data.world;
         let input: Read<InputHandler<StringBindings>> = data.world.system_data();
@@ -357,21 +353,41 @@ impl<'a, 'b> SimpleState for HighScoreScreen {
 }
 
 fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
-    let width = 20;
-    let height = 20;
+    let width = 12;
+    let height = 12;
     let sprite_size = 512.0;
-    let offset = (width as f32) * -0.5 * sprite_size;
+    let offset = sprite_size / 2.0;
     for i in 0..(width * height) {
         let mut transform = Transform::default();
+        let (sprite_x, sprite_y) = ((i % width), ((i / width) as u32));
         transform.set_translation_xyz(
-            (i % width) as f32 * sprite_size + offset,
-            ((i / width) as u32) as f32 * sprite_size + offset,
+            (sprite_x as f32) * sprite_size + offset,
+            (sprite_y as f32) * sprite_size + offset,
             -0.1,
         );
+
+        let (left_edge, right_edge, top_edge, bottom_edge) = (
+            sprite_x == 0,
+            sprite_x == width - 1,
+            sprite_y == height - 1,
+            sprite_y == 0,
+        );
+        let sprite_number = match (left_edge, right_edge, top_edge, bottom_edge) {
+            (false, false, true, false) => 1,
+            (false, true, false, false) => 2,
+            (false, false, false, true) => 3,
+            (true, false, false, false) => 4,
+            (false, true, true, false) => 5,
+            (false, true, false, true) => 6,
+            (true, false, false, true) => 7,
+            (true, false, true, false) => 8,
+            (_, _, _, _) => 0,
+        };
+
         //Sprite renderer
         let sprite_render = SpriteRender {
             sprite_sheet: sheet.clone(),
-            sprite_number: 0, // default ship is 0
+            sprite_number: sprite_number,
         };
         world
             .create_entity()
@@ -402,11 +418,9 @@ pub fn spawn_score_arrow(
     let vel_vec: Vector2<f32> = velocity.velocity;
     let up = Vector2::new(0.0, 1.0);
     let mut angle = up.angle(&vel_vec);
-    println!("a1 {}", up.angle(&vel_vec));
     if vel_vec.x > 0.0 {
         angle = 2.0 * PI as f32 - angle;
     }
-    println!("a2 {}", vel_vec.angle(&up));
     arrow_transform.set_rotation_2d(angle);
 
     //Sprite renderer

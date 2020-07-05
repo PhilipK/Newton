@@ -116,8 +116,8 @@ impl<'s> System<'s> for ScoreSystem {
             if let Some(player_position) = player_position_option {
                 for (_score_area, score_area_transform) in (&score_areas, &mut transforms).join() {
                     let (rnd_x, rnd_y) = (
-                        rng.gen::<f32>() * 2000.0 - 1000.0,
-                        rng.gen::<f32>() * 2000.0 - 1000.0,
+                        rng.gen::<f32>() * 512.0 * 12.0,
+                        rng.gen::<f32>() * 512.0 * 12.0,
                     );
                     score_area_transform.set_translation_xyz(rnd_x, rnd_y, 0.0);
                     //create score arrow
