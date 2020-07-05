@@ -1,8 +1,10 @@
 (
   axes: {
     "rotate": Emulated(pos: Key(D), neg: Key(A)),
-    "throttle": Emulated(pos: Key(W), neg: Key(S)),
+    "throttle": Emulated(pos: Key(W), neg: Key(S)),    
     "zoom": MouseWheel(horizontal: false),
   },
-  actions: {},
+  actions: {
+    "pause":  [ [Key(Escape)] ]
+  },
 )

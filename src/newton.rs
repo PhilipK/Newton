@@ -46,6 +46,7 @@ pub struct Newton<'a, 'b> {
     score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
     dispatcher: Option<Dispatcher<'a, 'b>>,
     star_field_sheet_handle: Option<Handle<SpriteSheet>>,
+    came_from_pause: bool,
 }
 
 impl Newton<'_, '_> {
@@ -67,7 +68,7 @@ impl Newton<'_, '_> {
     }
 
     fn load_planets(&mut self, world: &mut World) {
-        let meteor_number = 50;
+        let meteor_number = 20;
         for i in 0..meteor_number {
             star::initialize_star(
                 world,
@@ -108,7 +109,7 @@ impl Newton<'_, '_> {
             4,
             5,
         );
-         star::initialize_star(
+        star::initialize_star(
             world,
             1000000.0,
             64.0,
@@ -121,7 +122,7 @@ impl Newton<'_, '_> {
             5,
         );
 
-            star::initialize_star(
+        star::initialize_star(
             world,
             1000000.0,
             64.0,
@@ -173,8 +174,32 @@ impl Newton<'_, '_> {
     }
 }
 
+#[derive(Default)]
+struct PauseState {
+    pub was_release: bool,
+}
+
+impl<'a, 'b> SimpleState for PauseState {
+    fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
+        println!("In Puase");
+    }
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
+        if let Some(is_down) = input.action_is_down("pause") {
+            match (is_down, self.was_release) {
+                (true, true) => return Trans::Pop,
+                (false, true) => (),
+                (false, false) => self.was_release = true,
+                (true, false) => (),
+            };
+        }
+        Trans::None
+    }
+}
+
 impl<'a, 'b> SimpleState for Newton<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        println!("Starting Newton");
         let world = data.world;
 
         // Create the `DispatcherBuilder` and register some `System`s that should only run for this `State`.
@@ -206,11 +231,7 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
             "camera_system",
             &["velocity_to_transform_system"],
         );
-        dispatcher_builder.add(
-            WrapAroundSystem,
-            "wrap_around",
-            &[],
-        );
+        dispatcher_builder.add(WrapAroundSystem, "wrap_around", &[]);
 
         // Build and setup the `Dispatcher`.
         let mut dispatcher = dispatcher_builder
@@ -239,8 +260,24 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
         }
     }
 
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        println!("Resuming Newton");
+    }
+
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let world = &data.world;
+        let input: Read<InputHandler<StringBindings>> = data.world.system_data();
+
+        if let Some(is_down) = input.action_is_down("pause") {
+            if !self.came_from_pause && is_down {
+                self.came_from_pause = true;
+                return Trans::Push(Box::new(PauseState::default()));
+            }
+            if !is_down {
+                self.came_from_pause = false;
+            }
+        }
+
         if let Some(dispatcher) = self.dispatcher.as_mut() {
             dispatcher.dispatch(&world);
         }

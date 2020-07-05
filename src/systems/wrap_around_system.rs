@@ -6,12 +6,14 @@ use amethyst::ecs::{Join, ReadStorage, System, SystemData, WriteStorage};
 #[derive(SystemDesc)]
 pub struct WrapAroundSystem;
 
-pub const BOX_X_MIN: f32 = 512.0 * -5.0;
-pub const BOX_Y_MIN: f32 = 512.0 * -5.0;
-pub const BOX_X_MAX: f32 = 512.0 * 5.0;
-pub const BOX_Y_MAX: f32 = 512.0 * 5.0;
-pub const BOX_WIDTH: f32 = 512.0 * 10.0;
-pub const BOX_HEIGHT: f32 = 512.0 * 10.0;
+pub const SPRITE_SIZE: f32 = 512.0;
+pub const SPRITE_NUMBER: f32 = 12.0;
+pub const BOX_X_MIN: f32 = SPRITE_SIZE * -(SPRITE_NUMBER / 2.0);
+pub const BOX_Y_MIN: f32 = SPRITE_SIZE * -(SPRITE_NUMBER / 2.0);
+pub const BOX_X_MAX: f32 = SPRITE_SIZE * (SPRITE_NUMBER / 2.0);
+pub const BOX_Y_MAX: f32 = SPRITE_SIZE * (SPRITE_NUMBER / 2.0);
+pub const BOX_WIDTH: f32 = SPRITE_SIZE * SPRITE_NUMBER;
+pub const BOX_HEIGHT: f32 = SPRITE_SIZE * SPRITE_NUMBER;
 
 impl<'s> System<'s> for WrapAroundSystem {
     type SystemData = (WriteStorage<'s, Transform>, ReadStorage<'s, Velocity>);
