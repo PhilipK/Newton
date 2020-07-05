@@ -67,7 +67,7 @@ impl Newton<'_, '_> {
     }
 
     fn load_planets(&mut self, world: &mut World) {
-        let meteor_number = 20;
+        let meteor_number = 50;
         for i in 0..meteor_number {
             star::initialize_star(
                 world,
@@ -104,6 +104,31 @@ impl Newton<'_, '_> {
             0.0,
             -100.0,
             0.0,
+            self.star_sprite_sheet_handle.clone().unwrap(),
+            4,
+            5,
+        );
+         star::initialize_star(
+            world,
+            1000000.0,
+            64.0,
+            -1200.0,
+            -1200.0,
+            400.0,
+            400.0,
+            self.star_sprite_sheet_handle.clone().unwrap(),
+            4,
+            5,
+        );
+
+            star::initialize_star(
+            world,
+            1000000.0,
+            64.0,
+            1200.0,
+            1200.0,
+            -400.0,
+            -400.0,
             self.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
@@ -180,6 +205,11 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
             CameraSystem,
             "camera_system",
             &["velocity_to_transform_system"],
+        );
+        dispatcher_builder.add(
+            WrapAroundSystem,
+            "wrap_around",
+            &[],
         );
 
         // Build and setup the `Dispatcher`.
