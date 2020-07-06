@@ -3,6 +3,7 @@ use crate::components::ScoreArea;
 use crate::components::Velocity;
 use crate::components::ZoomCamera;
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
+use crate::systems::wrap_around_system::{BOX_X_MAX, BOX_Y_MAX};
 use crate::utils::distance_squared_vec;
 use amethyst::core::math::Vector3;
 use amethyst::core::timing::Time;
@@ -77,7 +78,6 @@ impl<'s> System<'s> for CameraSystem {
                                     get_scaled_camera_projection(zoom_camera.zoom_level);
                                 camera.set_projection(scaled_projection);
                             }
-
                             let mut tx = player_position.x;
                             let mut ty = player_position.y;
 
@@ -94,10 +94,31 @@ impl<'s> System<'s> for CameraSystem {
                                 tx = lerp(score_transform_cl.x, player_position.x, percent);
                                 ty = lerp(score_transform_cl.y, player_position.y, percent);
                             }
+
+                            let camera_max_y = BOX_Y_MAX - (zoom_camera.zoom_level * 1080.0) / 2.0;
+                            let camera_min_y = (zoom_camera.zoom_level * 1080.0) / 2.0;
+                            if ty > (camera_max_y) {
+                                ty = camera_max_y;
+                            }
+
+                            if ty < camera_min_y {
+                                ty = camera_min_y;
+                            }
+                            let camera_max_x = BOX_X_MAX - (zoom_camera.zoom_level * 1920.0) / 2.0;
+                            let camera_min_x = (zoom_camera.zoom_level * 1920.0) / 2.0;
+                            if tx > (camera_max_x) {
+                                tx = camera_max_x;
+                            }
+
+                            if tx < camera_min_x {
+                                tx = camera_min_x;
+                            }
                             let delta_seconds = time.delta_seconds() * lerp_mag;
-                            {
-                                let cur_camera_pos = camera_transform.translation();
-                                let (cx, cy) = (cur_camera_pos.x, cur_camera_pos.y);
+                            let cur_camera_pos = camera_transform.translation();
+                            let (cx, cy) = (cur_camera_pos.x, cur_camera_pos.y);
+                            if (cx - tx).abs() > 500.0 || (cy - ty).abs() > 500.0 {
+                                camera_transform.set_translation_xyz(tx, ty, 1.0);
+                            } else {
                                 camera_transform.set_translation_xyz(
                                     lerp(cx, tx, delta_seconds),
                                     lerp(cy, ty, delta_seconds),

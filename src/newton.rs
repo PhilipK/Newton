@@ -353,10 +353,10 @@ impl<'a, 'b> SimpleState for HighScoreScreen {
 }
 
 fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
-    let width = 12;
-    let height = 12;
-    let sprite_size = 512.0;
-    let offset = sprite_size / 2.0;
+    let width = NUMBER_OF_TILES as u32 + 2;
+    let height = width;
+    let sprite_size = SPRITE_SIZE;
+    let offset = sprite_size / 2.0 - sprite_size;
     for i in 0..(width * height) {
         let mut transform = Transform::default();
         let (sprite_x, sprite_y) = ((i % width), ((i / width) as u32));
@@ -366,28 +366,10 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
             -0.1,
         );
 
-        let (left_edge, right_edge, top_edge, bottom_edge) = (
-            sprite_x == 0,
-            sprite_x == width - 1,
-            sprite_y == height - 1,
-            sprite_y == 0,
-        );
-        let sprite_number = match (left_edge, right_edge, top_edge, bottom_edge) {
-            (false, false, true, false) => 1,
-            (false, true, false, false) => 2,
-            (false, false, false, true) => 3,
-            (true, false, false, false) => 4,
-            (false, true, true, false) => 5,
-            (false, true, false, true) => 6,
-            (true, false, false, true) => 7,
-            (true, false, true, false) => 8,
-            (_, _, _, _) => 0,
-        };
-
         //Sprite renderer
         let sprite_render = SpriteRender {
             sprite_sheet: sheet.clone(),
-            sprite_number: sprite_number,
+            sprite_number: 0,
         };
         world
             .create_entity()
