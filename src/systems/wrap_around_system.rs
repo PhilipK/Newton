@@ -7,7 +7,7 @@ use amethyst::ecs::{Join, ReadStorage, System, SystemData, WriteStorage};
 pub struct WrapAroundSystem;
 
 pub const SPRITE_SIZE: f32 = 512.0;
-pub const NUMBER_OF_TILES: f32 = 12.0;
+pub const NUMBER_OF_TILES: f32 = 15.0;
 pub const BOX_X_MIN: f32 = 0.;
 pub const BOX_Y_MIN: f32 = 0.;
 pub const BOX_WIDTH: f32 = SPRITE_SIZE * NUMBER_OF_TILES;
