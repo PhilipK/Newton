@@ -13,7 +13,6 @@ use crate::entities::score_area;
 use crate::entities::score_board;
 use crate::entities::star;
 use crate::entities::title_text;
-use crate::playercamera;
 
 use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
@@ -22,6 +21,7 @@ use std::f64::consts::PI;
 
 use amethyst::ecs::Entities;
 use amethyst::ecs::{Entity, Join, Read, ReadExpect, ReadStorage, Write};
+use crate::playercamera;
 
 use crate::systems::*;
 use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
@@ -32,6 +32,7 @@ use amethyst::{
     assets::Handle,
     prelude::{GameData, SimpleState, SimpleTrans, StateData},
     renderer::{SpriteRender, SpriteSheet},
+    ui::UiText,
 };
 
 #[derive(Default)]
@@ -179,15 +180,14 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         println!("Starting Newton");
         let world = data.world;
-        let (player_sprite, score_area, star_field) = {
+        let (player_sprite, score_area) = {
             let sprites: ReadExpect<SpriteResource> = world.system_data();
             let player_sprite = sprites
                 .player_sprite_sheet_handle
                 .clone()
                 .expect("Sprite sheet was not loaded before game was started");
             let score_area = sprites.score_area_sprite_sheet_handle.clone().unwrap();
-            let star_field = sprites.star_field_sheet_handle.clone().unwrap();
-            (player_sprite, score_area, star_field)
+            (player_sprite, score_area)
         };
 
         // Create the `DispatcherBuilder` and register some `System`s that should only run for this `State`.
@@ -227,13 +227,12 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
             .build();
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);
-
+        
         score_board::initialise_scoreboard(world);
         player::initialize_player(world, player_sprite);
+        playercamera::initialize_camera(world);
         self.load_planets(world);
         score_area::initialize_score_area(world, score_area);
-        playercamera::initialize_camera(world);
-        initialize_star_field(world, star_field);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -285,8 +284,8 @@ pub struct TitleScreen {}
 impl<'a, 'b> SimpleState for TitleScreen {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        
         title_text::itnitialize_title_text(world);
+        initialize_star_field(world);        
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
@@ -300,9 +299,10 @@ impl<'a, 'b> SimpleState for TitleScreen {
         Trans::None
     }
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();
-        for entity in (&system_data).join() {
-            let _unused = system_data.delete(entity);
+        let ui_text: ReadStorage<UiText> = data.world.system_data();
+        let entities: Entities = data.world.system_data();
+        for (_ui, entity) in (&ui_text, &entities).join() {
+            let _unused = entities.delete(entity);
         }
     }
 }
@@ -335,7 +335,11 @@ impl<'a, 'b> SimpleState for HighScoreScreen {
     }
 }
 
-fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
+fn initialize_star_field(world: &mut World) {
+    let star_field_sheet = {
+        let sprites: ReadExpect<SpriteResource> = world.system_data();
+        sprites.star_field_sheet_handle.clone().unwrap()
+    };
     let width = NUMBER_OF_TILES as u32 + 2;
     let height = width;
     let sprite_size = SPRITE_SIZE;
@@ -351,7 +355,7 @@ fn initialize_star_field(world: &mut World, sheet: Handle<SpriteSheet>) {
 
         //Sprite renderer
         let sprite_render = SpriteRender {
-            sprite_sheet: sheet.clone(),
+            sprite_sheet: star_field_sheet.clone(),
             sprite_number: 0,
         };
         world

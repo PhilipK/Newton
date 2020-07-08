@@ -49,11 +49,7 @@ impl SpriteResource {
             progress_counter,
             "star_field_big",
         ));
-        self.score_arrow_sheet_handle.replace(load_sprite_sheet(
-            world,
-            progress_counter,
-            "next_arrow",
-        ));
+       
     }
 }
 

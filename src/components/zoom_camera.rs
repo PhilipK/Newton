@@ -1,5 +1,6 @@
 use amethyst::ecs::prelude::{Component, DenseVecStorage};
 
+#[derive(Default)]
 pub struct ZoomCamera {
     pub zoom_level: f32,    
 }
