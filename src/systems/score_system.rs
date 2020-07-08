@@ -126,7 +126,7 @@ impl<'s> System<'s> for ScoreSystem {
                         arrow_builder,
                         &player_position,
                         score_area_transform,
-                        sprite_resource.arrow_sprite_sheet.clone(),
+                        sprite_resource.score_arrow_sheet_handle.clone().unwrap(),
                     );
                 }
             }

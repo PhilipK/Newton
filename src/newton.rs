@@ -3,6 +3,7 @@ use crate::components::ScoreArrow;
 use crate::components::SimpleAnimation;
 use crate::entities::high_score_text;
 use crate::entities::score_board::ScoreBoard;
+use crate::resources::sprite::SpriteResource;
 
 use amethyst_core::ArcThreadPool;
 
@@ -13,17 +14,14 @@ use crate::entities::score_board;
 use crate::entities::star;
 use crate::entities::title_text;
 use crate::playercamera;
-use crate::resources::initialise_sprite_resource;
-use crate::resources::initialize_audio;
 
 use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
 use std::f64::consts::PI;
 
-use crate::utils::load_sprite_sheet;
 use amethyst::ecs::Entities;
-use amethyst::ecs::{Entity, Join, Read, ReadStorage, Write};
+use amethyst::ecs::{Entity, Join, Read, ReadExpect, ReadStorage, Write};
 
 use crate::systems::*;
 use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
@@ -38,36 +36,16 @@ use amethyst::{
 
 #[derive(Default)]
 pub struct Newton<'a, 'b> {
-    player_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    star_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    earth_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
-    score_arrow_sheet_handle: Option<Handle<SpriteSheet>>,
     dispatcher: Option<Dispatcher<'a, 'b>>,
-    star_field_sheet_handle: Option<Handle<SpriteSheet>>,
     came_from_pause: bool,
 }
 
 impl Newton<'_, '_> {
-    fn load_sprite_sheets(&mut self, world: &mut World) {
-        self.player_sprite_sheet_handle
-            .replace(load_sprite_sheet(world, "player_spritesheet"));
-        self.star_sprite_sheet_handle
-            .replace(load_sprite_sheet(world, "star"));
-        self.earth_sprite_sheet_handle
-            .replace(load_sprite_sheet(world, "earth"));
-        self.meteor_sprite_sheet_handle
-            .replace(load_sprite_sheet(world, "meteor"));
-        self.score_area_sprite_sheet_handle
-            .replace(load_sprite_sheet(world, "score_area"));
-        self.score_arrow_sheet_handle
-            .replace(load_sprite_sheet(world, "next_arrow"));
-        self.star_field_sheet_handle
-            .replace(load_sprite_sheet(world, "star_field_big"));
-    }
-
     fn load_planets(&mut self, world: &mut World) {
+        let sprite = {
+            let s: ReadExpect<SpriteResource> = world.system_data();
+            s.clone()
+        };
         let meteor_number = 20;
         for i in 0..meteor_number {
             star::initialize_star(
@@ -78,7 +56,7 @@ impl Newton<'_, '_> {
                 (10000.0 / meteor_number as f32) * (i as f32),
                 0.0,
                 0.0,
-                self.meteor_sprite_sheet_handle.clone().unwrap(),
+                sprite.meteor_sprite_sheet_handle.clone().unwrap(),
                 4,
                 1,
             );
@@ -92,7 +70,7 @@ impl Newton<'_, '_> {
             0.0,
             -100.0,
             0.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
+            sprite.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
         );
@@ -105,7 +83,7 @@ impl Newton<'_, '_> {
             0.0,
             -100.0,
             0.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
+            sprite.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
         );
@@ -117,7 +95,7 @@ impl Newton<'_, '_> {
             -1200.0,
             400.0,
             400.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
+            sprite.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
         );
@@ -130,7 +108,7 @@ impl Newton<'_, '_> {
             1200.0,
             -400.0,
             -400.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
+            sprite.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
         );
@@ -143,7 +121,7 @@ impl Newton<'_, '_> {
             900.0,
             100.0,
             0.0,
-            self.star_sprite_sheet_handle.clone().unwrap(),
+            sprite.star_sprite_sheet_handle.clone().unwrap(),
             4,
             5,
         );
@@ -155,7 +133,7 @@ impl Newton<'_, '_> {
             800.0,
             100.0,
             -80.0,
-            self.earth_sprite_sheet_handle.clone().unwrap(),
+            sprite.earth_sprite_sheet_handle.clone().unwrap(),
             7,
             5,
         );
@@ -167,7 +145,7 @@ impl Newton<'_, '_> {
             100.0,
             -100.0,
             80.0,
-            self.earth_sprite_sheet_handle.clone().unwrap(),
+            sprite.earth_sprite_sheet_handle.clone().unwrap(),
             7,
             5,
         );
@@ -201,6 +179,16 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         println!("Starting Newton");
         let world = data.world;
+        let (player_sprite, score_area, star_field) = {
+            let sprites: ReadExpect<SpriteResource> = world.system_data();
+            let player_sprite = sprites
+                .player_sprite_sheet_handle
+                .clone()
+                .expect("Sprite sheet was not loaded before game was started");
+            let score_area = sprites.score_area_sprite_sheet_handle.clone().unwrap();
+            let star_field = sprites.star_field_sheet_handle.clone().unwrap();
+            (player_sprite, score_area, star_field)
+        };
 
         // Create the `DispatcherBuilder` and register some `System`s that should only run for this `State`.
         let mut dispatcher_builder = DispatcherBuilder::new();
@@ -241,16 +229,11 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
         self.dispatcher = Some(dispatcher);
 
         score_board::initialise_scoreboard(world);
-        self.load_sprite_sheets(world);
-        initialise_sprite_resource(world, self.score_arrow_sheet_handle.clone().unwrap());
-        player::initialize_player(world, self.player_sprite_sheet_handle.clone().unwrap());
+        player::initialize_player(world, player_sprite);
         self.load_planets(world);
-        score_area::initialize_score_area(
-            world,
-            self.score_area_sprite_sheet_handle.clone().unwrap(),
-        );
+        score_area::initialize_score_area(world, score_area);
         playercamera::initialize_camera(world);
-        initialize_star_field(world, self.star_field_sheet_handle.clone().unwrap());
+        initialize_star_field(world, star_field);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -302,7 +285,7 @@ pub struct TitleScreen {}
 impl<'a, 'b> SimpleState for TitleScreen {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        initialize_audio(world);
+        
         title_text::itnitialize_title_text(world);
     }
 

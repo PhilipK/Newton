@@ -1,4 +1,5 @@
 use crate::resources::Music;
+use crate::states::loading::LoadState;
 use amethyst::audio::DjSystemDesc;
 use amethyst::{
     core::transform::TransformBundle,
@@ -20,6 +21,7 @@ use amethyst::audio::AudioBundle;
 mod components;
 mod entities;
 mod resources;
+mod states;
 mod systems;
 
 mod utils;
@@ -60,9 +62,10 @@ fn main() -> amethyst::Result<()> {
             DjSystemDesc::new(|music: &mut Music| music.music.next()),
             "dj_system",
             &[],
-        );
+        )
+        ;
 
-    let mut game = Application::new(assets_dir, newton::TitleScreen::default(), game_data)?;
+    let mut game = Application::new(assets_dir, LoadState::default(), game_data)?;
     game.run();
 
     Ok(())
