@@ -1,3 +1,4 @@
+use crate::components::Destroyable;
 use crate::components::{Acceleration, Force, Gravity, Mass, Planet, SimpleAnimation, Velocity};
 use amethyst::{
     assets::Handle,
@@ -42,6 +43,7 @@ pub fn initialize_star(
         .with(SimpleAnimation::new(number_of_sprites, fps))
         .with(mass_comp)
         .with(force)
+        .with(Destroyable{})
         .with(planet)
         .with(sprite_render);
     if mass > 999.0 {

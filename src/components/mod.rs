@@ -10,12 +10,14 @@ pub use self::score_board::ScoreBoard;
 pub use self::simple_animation::SimpleAnimation;
 pub use self::velocity::Velocity;
 pub use self::zoom_camera::ZoomCamera;
+pub use self::destroyable::Destroyable;
 
 mod acceleration;
 mod force;
 mod gravity;
 mod mass;
 mod planet;
+mod destroyable;
 mod player;
 mod score_area;
 mod score_arrow;

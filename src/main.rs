@@ -1,5 +1,7 @@
+use crate::components::ZoomCamera;
 use crate::resources::Music;
 use crate::states::loading::LoadState;
+use crate::systems::CameraSystem;
 use amethyst::audio::DjSystemDesc;
 use amethyst::{
     core::transform::TransformBundle,
@@ -62,8 +64,7 @@ fn main() -> amethyst::Result<()> {
             DjSystemDesc::new(|music: &mut Music| music.music.next()),
             "dj_system",
             &[],
-        )
-        ;
+        );
 
     let mut game = Application::new(assets_dir, LoadState::default(), game_data)?;
     game.run();

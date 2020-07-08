@@ -1,4 +1,4 @@
-use crate::components::{Acceleration, Force, Mass, Player, Velocity};
+use crate::components::{Destroyable,Acceleration, Force, Mass, Player, Velocity};
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use amethyst::{
     assets::Handle,
@@ -34,6 +34,7 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
         .with(acceleration)
         .with(mass)
         .with(player)
+        .with(Destroyable{})
         .with(force)
         .with(sprite_render)
         .build();

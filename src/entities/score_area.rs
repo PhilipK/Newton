@@ -1,3 +1,4 @@
+use crate::components::Destroyable;
 use crate::components::ScoreArea;
 use crate::playercamera::{CAMERA_HEIGHT, CAMERA_WIDTH};
 use amethyst::{
@@ -22,6 +23,7 @@ pub fn initialize_score_area(world: &mut World, sprite_sheet_handle: Handle<Spri
         .create_entity()
         .with(transform)
         .with(score_area)
+        .with(Destroyable {})
         .with(sprite_render)
         .build();
 }

@@ -1,6 +1,8 @@
+use crate::components::Destroyable;
 use crate::components::Player;
 use crate::components::ScoreArrow;
 use crate::components::SimpleAnimation;
+use crate::components::ZoomCamera;
 use crate::entities::high_score_text;
 use crate::entities::score_board::ScoreBoard;
 use crate::resources::sprite::SpriteResource;
@@ -19,9 +21,9 @@ use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
 use std::f64::consts::PI;
 
+use crate::playercamera;
 use amethyst::ecs::Entities;
 use amethyst::ecs::{Entity, Join, Read, ReadExpect, ReadStorage, Write};
-use crate::playercamera;
 
 use crate::systems::*;
 use amethyst::ecs::prelude::{Dispatcher, DispatcherBuilder};
@@ -227,18 +229,17 @@ impl<'a, 'b> SimpleState for Newton<'a, 'b> {
             .build();
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);
-        
         score_board::initialise_scoreboard(world);
         player::initialize_player(world, player_sprite);
-        playercamera::initialize_camera(world);
         self.load_planets(world);
         score_area::initialize_score_area(world, score_area);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();
-        for entity in (&system_data).join() {
-            let _unused = system_data.delete(entity);
+        let entities: Entities = data.world.system_data();
+        let destroyable: ReadStorage<Destroyable> = data.world.system_data();
+        for (_, entity) in (&destroyable, &entities).join() {
+            let _unused = entities.delete(entity);
         }
     }
 
@@ -285,7 +286,10 @@ impl<'a, 'b> SimpleState for TitleScreen {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         title_text::itnitialize_title_text(world);
-        initialize_star_field(world);        
+        initialize_star_field(world);
+        world.register::<ZoomCamera>();
+        world.register::<Destroyable>();
+        playercamera::initialize_camera(world);
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
@@ -328,9 +332,10 @@ impl<'a, 'b> SimpleState for HighScoreScreen {
         Trans::None
     }
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let system_data: Entities = data.world.system_data();
-        for entity in (&system_data).join() {
-            let _unused = system_data.delete(entity);
+        let ui_text: ReadStorage<UiText> = data.world.system_data();
+        let entities: Entities = data.world.system_data();
+        for (_ui, entity) in (&ui_text, &entities).join() {
+            let _unused = entities.delete(entity);
         }
     }
 }
