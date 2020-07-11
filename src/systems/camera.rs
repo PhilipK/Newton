@@ -49,15 +49,15 @@ impl<'s> System<'s> for CameraSystem {
         let zoom_speed = 0.5;
         let max_zoom_level = 3.0;
         let min_zoom_level = 0.5;
-        let lerp_mag = 2.;
+        let lerp_mag = 5.;
 
         for (player_entity, _player, player_velocity) in (&entities, &players, &velocities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
                 let player_position = {
                     let p_pos = player_transform.translation().clone();
                     Vector3::new(
-                        p_pos.x + player_velocity.velocity.x,
-                        p_pos.y + player_velocity.velocity.y,
+                        p_pos.x + player_velocity.velocity.x.min(200.0),
+                        p_pos.y + player_velocity.velocity.y.min(200.0),
                         0.,
                     )
                 };
