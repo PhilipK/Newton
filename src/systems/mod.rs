@@ -19,7 +19,7 @@ mod player_animation_system;
 mod player_collision_system;
 mod player_controller;
 mod score_arrow_system;
-mod score_system;
+pub mod score_system;
 mod simple_animation_system;
 mod velocity_to_transform;
 mod wrap_around_system;

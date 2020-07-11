@@ -17,6 +17,15 @@ use std::ops::Deref;
 
 use rand::Rng;
 
+
+use crate::systems::wrap_around_system::{BOX_X_MAX, BOX_Y_MAX};
+
+pub const SCORE_AREA_SAFE_ZONE: f32 = 300.0;
+
+
+pub const TIME_TO_SCORE : f32 = 1.0;
+
+
 #[derive(SystemDesc)]
 pub struct ScoreSystem;
 
@@ -59,7 +68,7 @@ impl<'s> System<'s> for ScoreSystem {
     ) {
         let delta_seconds = time.delta_seconds();
         let mut rng = rand::thread_rng();
-        let time_limit = 3.0;
+        let time_limit = TIME_TO_SCORE;
         let sprite_steps = 4;
         let mut scored = false;
         let mut player_position_option: Option<Transform> = None;
@@ -116,8 +125,8 @@ impl<'s> System<'s> for ScoreSystem {
             if let Some(player_position) = player_position_option {
                 for (_score_area, score_area_transform) in (&score_areas, &mut transforms).join() {
                     let (rnd_x, rnd_y) = (
-                        rng.gen::<f32>() * 512.0 * 12.0,
-                        rng.gen::<f32>() * 512.0 * 12.0,
+                        rng.gen::<f32>() * (BOX_X_MAX - SCORE_AREA_SAFE_ZONE) + SCORE_AREA_SAFE_ZONE,
+                        rng.gen::<f32>() * (BOX_Y_MAX - SCORE_AREA_SAFE_ZONE) + SCORE_AREA_SAFE_ZONE,
                     );
                     score_area_transform.set_translation_xyz(rnd_x, rnd_y, 0.0);
                     //create score arrow
