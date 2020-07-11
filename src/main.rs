@@ -1,7 +1,5 @@
-use crate::components::ZoomCamera;
 use crate::resources::Music;
 use crate::states::loading::LoadState;
-use crate::systems::CameraSystem;
 use amethyst::audio::DjSystemDesc;
 use amethyst::{
     core::transform::TransformBundle,

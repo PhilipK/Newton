@@ -12,6 +12,7 @@ pub fn initialize_player(world: &mut World, sprite_sheet_handle: Handle<SpriteSh
         forward_thrust_power: 10000.0,
         turn_pr_second: 3.0,
         is_dead: false,
+        time_remaining : 3.0
     };
     let mass = Mass::new(1.0);
     let force = Force::new(0.0, 0.0);

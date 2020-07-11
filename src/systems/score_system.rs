@@ -17,21 +17,18 @@ use std::ops::Deref;
 
 use rand::Rng;
 
-
 use crate::systems::wrap_around_system::{BOX_X_MAX, BOX_Y_MAX};
 
 pub const SCORE_AREA_SAFE_ZONE: f32 = 300.0;
 
-
-pub const TIME_TO_SCORE : f32 = 1.0;
-
+pub const TIME_TO_SCORE: f32 = 1.0;
 
 #[derive(SystemDesc)]
 pub struct ScoreSystem;
 
 impl<'s> System<'s> for ScoreSystem {
     type SystemData = (
-        ReadStorage<'s, Player>,
+        WriteStorage<'s, Player>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, ScoreArea>,
         Read<'s, Time>,
@@ -50,7 +47,7 @@ impl<'s> System<'s> for ScoreSystem {
     fn run(
         &mut self,
         (
-            players,
+            mut players,
             mut transforms,
             mut score_areas,
             time,
@@ -72,7 +69,7 @@ impl<'s> System<'s> for ScoreSystem {
         let sprite_steps = 4;
         let mut scored = false;
         let mut player_position_option: Option<Transform> = None;
-        for (_player, player_entity) in (&players, &entities).join() {
+        for (player, player_entity) in (&mut players, &entities).join() {
             if let Some(player_transform) = transforms.get(player_entity) {
                 let player_position = player_transform;
                 player_position_option = Some(player_position.clone());
@@ -94,18 +91,24 @@ impl<'s> System<'s> for ScoreSystem {
 
                                 score_area.time_left = time_limit;
                                 scored = true;
+                                player.time_remaining = 30.0;
                                 score_board.score += 1;
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
                             } else {
                                 if time_before.ceil() > score_area.time_left.ceil() {
-                                    //we scored
+                                    //we are in score area
                                     play_score_tick_sound(
                                         &*sounds,
                                         &storage,
                                         audio_output.as_ref().map(|o| o.deref()),
                                     );
                                 }
+                            }
+                        } else {
+                            player.time_remaining -= delta_seconds;
+                            if player.time_remaining <= 0.0 {
+                                player.is_dead = true;
                             }
                         }
                         if score_area.time_left > 0.0 {
@@ -125,8 +128,10 @@ impl<'s> System<'s> for ScoreSystem {
             if let Some(player_position) = player_position_option {
                 for (_score_area, score_area_transform) in (&score_areas, &mut transforms).join() {
                     let (rnd_x, rnd_y) = (
-                        rng.gen::<f32>() * (BOX_X_MAX - SCORE_AREA_SAFE_ZONE) + SCORE_AREA_SAFE_ZONE,
-                        rng.gen::<f32>() * (BOX_Y_MAX - SCORE_AREA_SAFE_ZONE) + SCORE_AREA_SAFE_ZONE,
+                        rng.gen::<f32>() * (BOX_X_MAX - 2.0 * SCORE_AREA_SAFE_ZONE)
+                            + SCORE_AREA_SAFE_ZONE,
+                        rng.gen::<f32>() * (BOX_Y_MAX - 2.0 * SCORE_AREA_SAFE_ZONE)
+                            + SCORE_AREA_SAFE_ZONE,
                     );
                     score_area_transform.set_translation_xyz(rnd_x, rnd_y, 0.0);
                     //create score arrow
