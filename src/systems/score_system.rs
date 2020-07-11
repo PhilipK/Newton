@@ -8,9 +8,7 @@ use amethyst::audio::{output::Output, Source};
 use amethyst::core::{timing::Time, Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::prelude::LazyUpdate;
-use amethyst::ecs::{
-    Entities, Join, Read, ReadExpect, ReadStorage, System, SystemData, Write, WriteStorage,
-};
+use amethyst::ecs::{Entities, Join, Read, ReadExpect, System, SystemData, Write, WriteStorage};
 use amethyst::renderer::SpriteRender;
 use amethyst::ui::UiText;
 use std::ops::Deref;
@@ -123,7 +121,10 @@ impl<'s> System<'s> for ScoreSystem {
                     }
                 }
             }
+            let timer_ut_text = ui_texts.get_mut(score_text.timer).unwrap();
+            timer_ut_text.text = format!("{:.2}",player.time_remaining);
         }
+
         if scored {
             if let Some(player_position) = player_position_option {
                 for (_score_area, score_area_transform) in (&score_areas, &mut transforms).join() {

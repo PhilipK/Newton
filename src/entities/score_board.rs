@@ -12,6 +12,7 @@ pub struct ScoreBoard {
 
 pub struct ScoreText {
     pub score: Entity,
+    pub timer: Entity,
 }
 
 pub fn initialise_scoreboard(world: &mut World) {
@@ -34,7 +35,24 @@ pub fn initialise_scoreboard(world: &mut World) {
     let score = world
         .create_entity()
         .with(transform)
-        .with(UiText::new(font, "0".to_string(), [1., 1., 1., 1.], 50.))
+        .with(UiText::new(font.clone(), "0".to_string(), [1., 1., 1., 1.], 50.))
         .build();
-    world.insert(ScoreText { score });
+
+    let transform = UiTransform::new(
+        "TIMER".to_string(),
+        Anchor::BottomMiddle,
+        Anchor::BottomMiddle,
+        0.,
+        0.,
+        1.,
+        200.,
+        50.,
+    );
+    let timer = world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(font, "30.0".to_string(), [1., 1., 1., 1.], 50.))
+        .build();
+
+    world.insert(ScoreText { score, timer });
 }
