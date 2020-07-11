@@ -89,8 +89,9 @@ impl<'s> System<'s> for ScoreSystem {
 
                                 score_area.time_left = time_limit;
                                 scored = true;
-                                player.time_remaining = 30.0;
+                                
                                 score_board.score += 1;
+                                player.time_remaining = (30.0  - (score_board.score as f32)).max(15.0);
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
                             } else {
@@ -106,6 +107,7 @@ impl<'s> System<'s> for ScoreSystem {
                         } else {
                             player.time_remaining -= delta_seconds;
                             if player.time_remaining <= 0.0 {
+                                player.time_remaining = 0.0;
                                 player.is_dead = true;
                             }
                         }
