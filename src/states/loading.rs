@@ -23,7 +23,7 @@ impl<'a, 'b> SimpleState for LoadState {
         initialize_audio(world);
     }
 
-    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+    fn update(&mut self, _data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         if self.progress_counter.is_complete() {
             println!("done loading");
             return Trans::Push(Box::new(TitleScreen::default()));

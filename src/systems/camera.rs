@@ -83,8 +83,8 @@ impl<'s> System<'s> for CameraSystem {
 
                             let distance =
                                 distance_squared_vec(&player_position, &score_transform_cl).sqrt();
-                            let max_distance = 800.0;
-                            let min_distance = 300.0;
+                            let max_distance = 400.0;
+                            let min_distance = 150.0;
                             if distance < max_distance {
                                 let mut percent = 0.0;
                                 if distance > min_distance {
@@ -133,12 +133,12 @@ impl<'s> System<'s> for CameraSystem {
     }
 }
 
-fn lerp(a: f32, b: f32, percent: f32) -> f32 {
+pub fn lerp(a: f32, b: f32, percent: f32) -> f32 {
     let cpr = clamp(percent, 0.0, 1.0);
     (1.0 - cpr) * a + cpr * b
 }
 
-fn clamp(input: f32, min: f32, max: f32) -> f32 {
+pub fn clamp(input: f32, min: f32, max: f32) -> f32 {
     if input < min {
         return min;
     }

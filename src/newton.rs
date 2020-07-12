@@ -9,17 +9,14 @@ use crate::resources::sprite::SpriteResource;
 
 use amethyst_core::ArcThreadPool;
 
-use crate::components::Velocity;
 use crate::entities::player;
 use crate::entities::score_area;
 use crate::entities::score_board;
 use crate::entities::star;
 use crate::entities::title_text;
 
-use amethyst::core::math::Vector2;
 use amethyst::core::transform::Transform;
 use amethyst::ecs::world::LazyBuilder;
-use std::f64::consts::PI;
 
 use crate::playercamera;
 use amethyst::ecs::Entities;
@@ -36,6 +33,7 @@ use amethyst::{
     renderer::{SpriteRender, SpriteSheet},
     ui::UiText,
 };
+use amethyst_rendy::{palette::Srgba, resources::Tint};
 
 #[derive(Default)]
 pub struct Newton<'a, 'b> {
@@ -374,29 +372,13 @@ fn initialize_star_field(world: &mut World) {
 pub fn spawn_score_arrow(
     builder: LazyBuilder,
     current_pos: &Transform,
-    target_pos: &Transform,
     sprite_sheet_handle: Handle<SpriteSheet>,
 ) -> Entity {
     //create score arrow
     let mut arrow_transform = Transform::default();
     let cur_x = current_pos.translation().x;
     let cur_y = current_pos.translation().y;
-    let target_x = target_pos.translation().x;
-    let target_y = target_pos.translation().y;
     arrow_transform.set_translation_xyz(cur_x, cur_y, 0.0);
-
-    let (x, y) = (target_x - cur_x, target_y - cur_y);
-    let mag = ((x * x) + (y * y)).sqrt();
-    let speed = 250.0;
-    let velocity = Velocity::new(x / mag * speed, y / mag * speed);
-    let vel_vec: Vector2<f32> = velocity.velocity;
-    let up = Vector2::new(0.0, 1.0);
-    let mut angle = up.angle(&vel_vec);
-    if vel_vec.x > 0.0 {
-        angle = 2.0 * PI as f32 - angle;
-    }
-    arrow_transform.set_rotation_2d(angle);
-
     //Sprite renderer
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle,
@@ -404,12 +386,12 @@ pub fn spawn_score_arrow(
     };
 
     let animation = SimpleAnimation::new(5, 5);
-
+    let tint = Tint(Srgba::new(1.0, 1.0, 1.0, 0.0));
     return builder
         .with(arrow_transform)
         .with(ScoreArrow {})
+        .with(tint)
         .with(sprite_render)
-        .with(velocity)
         .with(animation)
         .build();
 }

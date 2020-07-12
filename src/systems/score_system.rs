@@ -89,9 +89,10 @@ impl<'s> System<'s> for ScoreSystem {
 
                                 score_area.time_left = time_limit;
                                 scored = true;
-                                
+
                                 score_board.score += 1;
-                                player.time_remaining = (30.0  - (score_board.score as f32)).max(15.0);
+                                player.time_remaining =
+                                    (30.0 - (score_board.score as f32)).max(15.0);
                                 let score_ui_text = ui_texts.get_mut(score_text.score).unwrap();
                                 score_ui_text.text = score_board.score.to_string();
                             } else {
@@ -124,7 +125,7 @@ impl<'s> System<'s> for ScoreSystem {
                 }
             }
             let timer_ut_text = ui_texts.get_mut(score_text.timer).unwrap();
-            timer_ut_text.text = format!("{:.2}",player.time_remaining);
+            timer_ut_text.text = format!("{:.2}", player.time_remaining);
         }
 
         if scored {
@@ -137,14 +138,16 @@ impl<'s> System<'s> for ScoreSystem {
                             + SCORE_AREA_SAFE_ZONE,
                     );
                     score_area_transform.set_translation_xyz(rnd_x, rnd_y, 0.0);
-                    //create score arrow
-                    let arrow_builder = lazy.create_entity(&entities);
-                    let _entity = spawn_score_arrow(
-                        arrow_builder,
-                        &player_position,
-                        score_area_transform,
-                        sprite_resource.score_arrow_sheet_handle.clone().unwrap(),
-                    );
+
+                    if score_board.score == 1 {
+                        //create score arrow
+                        let arrow_builder = lazy.create_entity(&entities);
+                        let _entity = spawn_score_arrow(
+                            arrow_builder,
+                            &player_position,
+                            sprite_resource.score_arrow_sheet_handle.clone().unwrap(),
+                        );
+                    }
                 }
             }
         }
