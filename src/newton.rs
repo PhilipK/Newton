@@ -159,9 +159,6 @@ struct PauseState {
 }
 
 impl<'a, 'b> SimpleState for PauseState {
-    fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
-        println!("In Puase");
-    }
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let input: Read<InputHandler<StringBindings>> = data.world.system_data();
         if let Some(is_down) = input.action_is_down("pause") {

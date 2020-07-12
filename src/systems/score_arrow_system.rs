@@ -56,7 +56,6 @@ impl<'s> System<'s> for ScoreArrowSystem {
                 }
                 arrow_transform.set_translation_xyz(arrow_position.x, arrow_position.y, 0.0);
                 arrow_transform.set_rotation_2d(angle);
-                println!("{}", player_to_score_length);
                 if player_to_score_length < 600.0 {
                     tint.0.alpha = 0.0;
                 } else {

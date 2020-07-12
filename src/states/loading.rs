@@ -28,7 +28,6 @@ impl<'a, 'b> SimpleState for LoadState {
             println!("done loading");
             return Trans::Push(Box::new(TitleScreen::default()));
         }
-        println!("not done loading");
         Trans::None
     }
 }
