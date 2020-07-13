@@ -13,6 +13,9 @@ pub struct SpriteResource {
     pub meteor_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     pub score_area_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     pub star_field_sheet_handle: Option<Handle<SpriteSheet>>,
+    pub mars_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+    pub saturn_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+    pub uranus_sprite_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 pub fn initialise_sprite_resource(world: &mut World, progress_counter: &mut ProgressCounter) {
@@ -49,7 +52,21 @@ impl SpriteResource {
             progress_counter,
             "star_field_big",
         ));
-       
+        self.mars_sprite_sheet_handle.replace(load_sprite_sheet(
+            world,
+            progress_counter,
+            "mars",
+        ));
+        self.saturn_sprite_sheet_handle.replace(load_sprite_sheet(
+            world,
+            progress_counter,
+            "saturn",
+        ));
+        self.uranus_sprite_sheet_handle.replace(load_sprite_sheet(
+            world,
+            progress_counter,
+            "uranus",
+        ));
     }
 }
 
